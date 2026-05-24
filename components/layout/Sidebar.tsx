@@ -9,14 +9,17 @@ import {
   CalendarCheck,
   Clipboard,
   ClockHistory,
+  ExclamationTriangle,
   FileEarmarkCheck,
   Flag,
   Gear,
   Grid1x2,
   House,
   PersonCircle,
+  PersonLinesFill,
   ListCheck,
   People,
+  Receipt,
   Star,
   X,
   LayoutSidebar,
@@ -63,9 +66,9 @@ const homeNavItems: SidebarNavItem[] = [
 ];
 
 const recordsNavItems: SidebarNavItem[] = [
-  { label: "Subtab 1", href: "/dashboard/records/subtab-1", icon: Clipboard },
-  { label: "Subtab 2", href: "/dashboard/records/subtab-2", icon: Clipboard },
-  { label: "Subtab 3", href: "/dashboard/records/subtab-3", icon: Clipboard }
+  { label: "Customer Records", href: "/dashboard/records/subtab-1", icon: PersonLinesFill },
+  { label: "Financial Records", href: "/dashboard/records/subtab-2", icon: Receipt },
+  { label: "Incidents", href: "/dashboard/records/subtab-3", icon: ExclamationTriangle }
 ];
 
 const cleaningNavItems: SidebarNavItem[] = [

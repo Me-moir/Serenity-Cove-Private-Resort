@@ -1,35 +1,54 @@
 import SectionDivider from "@/components/ui/SectionDivider";
+import { getIncidents } from "@/lib/data/queries";
 
-const systemFlags = [
-  { title: "Payment API Timeout", severity: "High", detail: "Intermittent failures from 08:20 to 08:47." },
-  { title: "Reservation Sync Delay", severity: "Medium", detail: "Average sync lag reached 2 minutes." },
-  { title: "Guest Portal Login Errors", severity: "High", detail: "12 failed sessions detected in the last hour." }
-];
+const statusStyles: Record<string, string> = {
+  None: "bg-black/10 text-text-muted",
+  Reported: "bg-accent-orange/15 text-accent-orange",
+  Pending: "bg-accent-blue/15 text-accent-blue",
+  Resolved: "bg-accent-green/15 text-accent-green",
+};
 
-export default function FlagsSubtab1Page() {
+export default async function FlagsSubtab1Page() {
+  const incidents = await getIncidents();
+  const active = incidents.filter((i) => i.status !== "Resolved" && i.status !== "None");
+
   return (
     <div className="space-y-8">
       <SectionDivider label="Flags" />
 
       <div className="rounded-3xl bg-card-light p-6 shadow-sm">
-        <h1 className="text-2xl font-semibold">System Flags</h1>
-        <p className="mt-2 text-text-muted">
-          Live placeholders for system crashes and operational incidents.
-        </p>
-
-        <div className="mt-6 space-y-3">
-          {systemFlags.map((flag) => (
-            <article key={flag.title} className="rounded-2xl border border-border p-4">
-              <div className="flex items-center justify-between gap-3">
-                <h2 className="text-sm font-semibold">{flag.title}</h2>
-                <span className="rounded-full bg-topbar px-2 py-1 text-[10px] font-semibold uppercase tracking-[0.2em] text-text-on-dark">
-                  {flag.severity}
-                </span>
-              </div>
-              <p className="mt-2 text-sm text-text-muted">{flag.detail}</p>
-            </article>
-          ))}
+        <div className="flex items-center justify-between">
+          <h1 className="text-2xl font-semibold">Active Incidents</h1>
+          <span className="text-sm text-text-muted">{active.length} active</span>
         </div>
+
+        {active.length === 0 ? (
+          <p className="mt-6 text-sm text-text-muted">No active incidents.</p>
+        ) : (
+          <div className="mt-6 space-y-3">
+            {active.map((inc) => (
+              <article key={inc.incident_id} className="rounded-2xl border border-border p-4">
+                <div className="flex items-start justify-between gap-3">
+                  <div>
+                    <h2 className="text-sm font-semibold">{inc.guests?.guest_name ?? "Unknown Guest"}</h2>
+                    {inc.reservations?.order_id && (
+                      <div className="mt-0.5 font-mono text-[10px] text-text-muted">
+                        {inc.reservations.order_id}
+                      </div>
+                    )}
+                    <p className="mt-2 text-sm text-text-muted">{inc.description}</p>
+                  </div>
+                  <span className={`shrink-0 rounded-full px-2 py-0.5 text-[10px] font-semibold uppercase tracking-[0.15em] ${statusStyles[inc.status] ?? ""}`}>
+                    {inc.status}
+                  </span>
+                </div>
+                <div className="mt-2 text-xs text-text-muted">
+                  Reported {new Date(inc.reported_at).toLocaleDateString("en-PH")}
+                </div>
+              </article>
+            ))}
+          </div>
+        )}
       </div>
     </div>
   );
