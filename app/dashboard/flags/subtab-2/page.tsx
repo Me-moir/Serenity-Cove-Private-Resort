@@ -1,3 +1,5 @@
+export const dynamic = "force-dynamic";
+
 import { getCalendarEvents } from "@/lib/data/queries";
 
 const flagTypeStyles: Record<string, string> = {

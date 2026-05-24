@@ -1,3 +1,5 @@
+export const dynamic = "force-dynamic";
+
 import SectionDivider from "@/components/ui/SectionDivider";
 import GuestStatsCard from "@/components/dashboard/GuestStatsCard";
 import FinanceCard from "@/components/dashboard/FinanceCard";

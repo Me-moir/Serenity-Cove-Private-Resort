@@ -1,3 +1,5 @@
+export const dynamic = "force-dynamic";
+
 import { getReviews } from "@/lib/data/queries";
 
 function StarRating({ rating }: { rating: number }) {

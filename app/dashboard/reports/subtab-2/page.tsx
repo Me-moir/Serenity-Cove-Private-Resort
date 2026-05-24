@@ -1,3 +1,5 @@
+export const dynamic = "force-dynamic";
+
 import { getFinanceSummary, getFinancialRecords } from "@/lib/data/queries";
 
 const PHP = (amount: number) =>

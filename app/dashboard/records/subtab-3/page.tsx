@@ -1,3 +1,5 @@
+export const dynamic = "force-dynamic";
+
 import { getIncidents } from "@/lib/data/queries";
 
 const statusStyles: Record<string, string> = {

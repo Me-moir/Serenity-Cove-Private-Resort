@@ -1,3 +1,5 @@
+export const dynamic = "force-dynamic";
+
 import { getReservationStats } from "@/lib/data/queries";
 
 export default async function ReportsSubtab1Page() {

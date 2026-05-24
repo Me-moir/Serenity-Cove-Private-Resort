@@ -1,3 +1,5 @@
+export const dynamic = "force-dynamic";
+
 import SectionDivider from "@/components/ui/SectionDivider";
 import { getIncidents } from "@/lib/data/queries";
 

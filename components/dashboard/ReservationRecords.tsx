@@ -275,7 +275,7 @@ export default function ReservationRecords({ reservations }: Props) {
 
         {/* Toolbar */}
         <div className="flex flex-wrap items-center gap-3 border-b border-border px-6 py-4">
-          <div className="relative max-w-xs flex-1">
+          <div className="rainbow-search relative max-w-xs flex-1">
             <Search
               className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-text-muted"
               size={13}
@@ -285,7 +285,7 @@ export default function ReservationRecords({ reservations }: Props) {
               value={search}
               onChange={(e) => { setSearch(e.target.value); setPage(1); }}
               placeholder="Search by guest or order ID..."
-              className="h-9 w-full rounded-xl border border-border bg-shell pl-8 pr-4 text-sm text-text-on-light placeholder:text-text-muted focus:border-[#9a9a9a] focus:outline-none transition"
+              className="h-9 w-full bg-transparent pl-8 pr-4 text-sm text-text-on-light placeholder:text-text-muted focus:outline-none"
             />
           </div>
 

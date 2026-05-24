@@ -342,7 +342,7 @@ export default function ReservationApproval({ reservations, guests }: Props) {
 
         {/* Search + Add */}
         <div className="flex items-center gap-3 border-b border-border px-6 py-4">
-          <div className="relative flex-1 max-w-sm">
+          <div className="rainbow-search relative max-w-sm flex-1">
             <Search
               className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-text-muted"
               size={13}
@@ -352,7 +352,7 @@ export default function ReservationApproval({ reservations, guests }: Props) {
               value={search}
               onChange={(e) => setSearch(e.target.value)}
               placeholder="Search reservation..."
-              className="h-9 w-full rounded-xl border border-border bg-shell pl-8 pr-4 text-sm text-text-on-light placeholder:text-text-muted focus:border-[#9a9a9a] focus:outline-none transition"
+              className="h-9 w-full bg-transparent pl-8 pr-4 text-sm text-text-on-light placeholder:text-text-muted focus:outline-none"
             />
           </div>
           <button

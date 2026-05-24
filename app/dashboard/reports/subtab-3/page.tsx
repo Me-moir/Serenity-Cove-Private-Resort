@@ -1,3 +1,5 @@
+export const dynamic = "force-dynamic";
+
 import { getGuestStats, getGuests } from "@/lib/data/queries";
 
 export default async function ReportsSubtab3Page() {

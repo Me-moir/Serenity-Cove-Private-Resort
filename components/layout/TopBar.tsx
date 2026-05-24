@@ -1,6 +1,7 @@
 "use client";
 
 import { Bell, List, ThermometerHigh } from "react-bootstrap-icons";
+import { usePathname } from "next/navigation";
 import { useLiveConditions } from "@/hooks/useLiveConditions";
 
 interface TopBarProps {
@@ -14,17 +15,16 @@ function formatTemperature(value: number | undefined) {
   if (typeof value !== "number" || Number.isNaN(value)) {
     return "--°C";
   }
-
   return `${Math.round(value)}°C`;
 }
 
 export default function TopBar({ onMenuClick }: TopBarProps) {
+  const pathname = usePathname();
+  const isSummary = pathname === "/dashboard/summary";
+
   const { conditions, now, error } = useLiveConditions();
   const timezone = conditions?.timezone || FALLBACK_TIMEZONE;
-  const dayName = now.toLocaleDateString("en-US", {
-    weekday: "long",
-    timeZone: timezone
-  });
+  const dayName = now.toLocaleDateString("en-US", { weekday: "long", timeZone: timezone });
   const dateLabel = now.toLocaleDateString("en-GB", {
     day: "2-digit",
     month: "long",
@@ -44,9 +44,30 @@ export default function TopBar({ onMenuClick }: TopBarProps) {
   const locationLabel = conditions?.locationName || FALLBACK_LOCATION;
   const timezoneLabel = conditions?.timezoneAbbreviation || "GMT+8";
 
+  if (!isSummary) {
+    return (
+      <header className="w-full bg-topbar text-text-on-dark md:hidden">
+        <div className="flex items-center justify-between px-3 py-3 sm:px-6">
+          <button
+            type="button"
+            onClick={onMenuClick}
+            className="rounded-full p-2"
+            aria-label="Open sidebar"
+          >
+            <List size={20} />
+          </button>
+          <button type="button" className="rounded-full p-2" aria-label="Alerts">
+            <Bell size={18} />
+          </button>
+        </div>
+      </header>
+    );
+  }
+
   return (
     <header className="w-full bg-topbar text-text-on-dark">
       <div className="flex items-center justify-between px-3 py-3 sm:px-6 lg:px-8">
+        {/* mobile: hamburger */}
         <div className="flex min-w-[2.75rem] items-center md:hidden">
           <button
             type="button"
@@ -58,6 +79,7 @@ export default function TopBar({ onMenuClick }: TopBarProps) {
           </button>
         </div>
 
+        {/* mobile: date/time center */}
         <div className="flex flex-1 items-center justify-center px-2 text-center md:hidden">
           <div className="text-center">
             <div className="text-sm font-semibold">{dayName}</div>
@@ -66,12 +88,14 @@ export default function TopBar({ onMenuClick }: TopBarProps) {
           </div>
         </div>
 
+        {/* mobile: bell */}
         <div className="flex min-w-[2.75rem] items-center justify-end md:hidden">
           <button type="button" className="rounded-full p-2" aria-label="Alerts">
             <Bell size={18} />
           </button>
         </div>
 
+        {/* desktop: full weather header */}
         <div className="hidden w-full items-center gap-8 md:flex">
           <div className="text-xs uppercase tracking-[0.4em] text-text-on-dark/70">
             Today

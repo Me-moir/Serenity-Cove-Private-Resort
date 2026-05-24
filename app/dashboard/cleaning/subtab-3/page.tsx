@@ -1,3 +1,5 @@
+export const dynamic = "force-dynamic";
+
 import { getCleaningTasks } from "@/lib/data/queries";
 
 export default async function CleaningSubtab3Page() {
