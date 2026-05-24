@@ -2,7 +2,7 @@
 
 import Image from "next/image";
 import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Eye, EyeSlash, LockFill, PersonFill } from "react-bootstrap-icons";
 
 const ADMIN_USERNAME = "admin";
@@ -46,8 +46,12 @@ export default function LoginPage() {
     }
 
     setAuthCookie();
-    router.push("/dashboard/summary");
+    window.location.href = "/dashboard/summary";
   };
+
+  useEffect(() => {
+    router.prefetch("/dashboard/summary");
+  }, [router]);
 
   const hasError = Boolean(errorMessage);
 
