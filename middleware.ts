@@ -8,11 +8,17 @@ export async function middleware(request: NextRequest) {
     }
   });
 
+  const hasLocalAuth = request.cookies.get("sc_admin")?.value === "1";
+  if (hasLocalAuth) {
+    return response;
+  }
+
   const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
   const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
 
   if (!supabaseUrl || !supabaseAnonKey) {
-    return response;
+    const loginUrl = new URL("/login", request.url);
+    return NextResponse.redirect(loginUrl);
   }
 
   const supabase = createServerClient(supabaseUrl, supabaseAnonKey, {
