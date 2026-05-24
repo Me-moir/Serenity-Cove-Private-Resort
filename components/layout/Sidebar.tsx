@@ -107,7 +107,7 @@ const settingsNavItems: SidebarNavItem[] = [
 const mainTabNavItems: MainTabNavItem[] = [
   {
     id: "HomeDashboard",
-    label: "Summary",
+    label: "Home Dashboard",
     href: "/dashboard/summary",
     icon: House
   },
@@ -190,7 +190,7 @@ export default function Sidebar({
   const activeIndex = navItems.findIndex((item) => item.href === activePath);
   const activeBarWidth = INNER_SIDEBAR_WIDTH;
   const titleMap: Record<string, { label: string; title?: string }> = {
-    HomeDashboard: { label: "Summary" },
+    HomeDashboard: { label: "Home", title: "Dashboard" },
     RecordsManagement: { label: "Records", title: "Management" },
     CleaningSchedule: { label: "Cleaning", title: "Schedule" },
     ReportsAnalytics: { label: "Reports", title: "Analytics" },
@@ -285,7 +285,7 @@ export default function Sidebar({
 
   const sidebarContent = (
     <div className="flex h-full flex-col">
-      <div className="flex items-center justify-between px-4 pt-6">
+      <div className="hidden items-center justify-between px-4 pt-6 md:flex">
         <div className="leading-tight">
           <div className="text-xs uppercase tracking-[0.3em] text-text-muted">
             {activeTitle.label}
@@ -343,8 +343,6 @@ export default function Sidebar({
                     }
 
                     const isActiveSubItem = activePath === href;
-
-
                     return (
                       <button
                         key={`${section.id}-${item.label}`}
@@ -352,7 +350,7 @@ export default function Sidebar({
                         onClick={() => handleMobileNavigate(href)}
                         className={`flex h-10 w-full items-center gap-2 rounded-xl px-2 text-left text-sm transition ${
                           isActiveSubItem
-                            ? "bg-topbar/85 text-text-on-dark"
+                            ? "bg-topbar text-text-on-dark shadow-sm"
                             : "text-text-on-light hover:bg-shell"
                         }`}
                       >

@@ -3,7 +3,7 @@
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
-import { LockFill, PersonFill } from "react-bootstrap-icons";
+import { Eye, EyeSlash, LockFill, PersonFill } from "react-bootstrap-icons";
 
 const ADMIN_USERNAME = "admin";
 const ADMIN_PASSWORD = "admin";
@@ -14,6 +14,8 @@ export default function LoginPage() {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [rememberMe, setRememberMe] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
+  const [capsLockOn, setCapsLockOn] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
   const [isLoading, setIsLoading] = useState(false);
 
@@ -46,6 +48,8 @@ export default function LoginPage() {
     setAuthCookie();
     router.push("/dashboard/summary");
   };
+
+  const hasError = Boolean(errorMessage);
 
   return (
     <div className="flex min-h-screen items-center justify-center bg-[#e6e7eb] px-4 text-[#555556]">
@@ -81,8 +85,18 @@ export default function LoginPage() {
             <label className="text-xs font-semibold uppercase tracking-[0.2em] text-[#a6a6ab]">
               Username
             </label>
-            <div className="mt-2 flex h-11 items-center rounded-lg bg-white shadow-sm">
-              <span className="flex h-full w-11 items-center justify-center border-r border-[#e1e1e6] text-[#b8b8bc]">
+            <div
+              className={`mt-2 flex h-11 items-center rounded-lg bg-white shadow-sm transition ${
+                hasError
+                  ? "ring-1 ring-red-400"
+                  : "border border-transparent"
+              }`}
+            >
+              <span
+                className={`flex h-full w-11 items-center justify-center border-r text-[#b8b8bc] ${
+                  hasError ? "border-red-200" : "border-[#e1e1e6]"
+                }`}
+              >
                 <PersonFill size={16} />
               </span>
               <input
@@ -91,7 +105,12 @@ export default function LoginPage() {
                 autoComplete="username"
                 required
                 value={username}
-                onChange={(event) => setUsername(event.target.value)}
+                onChange={(event) => {
+                  setUsername(event.target.value);
+                  if (errorMessage) {
+                    setErrorMessage("");
+                  }
+                }}
                 placeholder="input username here"
                 className="h-full flex-1 bg-transparent px-3 text-sm text-[#4a4a4d] placeholder:text-[#c2c2c7] focus:outline-none"
                 aria-label="Username"
@@ -103,22 +122,53 @@ export default function LoginPage() {
             <label className="text-xs font-semibold uppercase tracking-[0.2em] text-[#a6a6ab]">
               Password
             </label>
-            <div className="mt-2 flex h-11 items-center rounded-lg bg-white shadow-sm">
-              <span className="flex h-full w-11 items-center justify-center border-r border-[#e1e1e6] text-[#b8b8bc]">
+            <div
+              className={`mt-2 flex h-11 items-center rounded-lg bg-white shadow-sm transition ${
+                hasError
+                  ? "ring-1 ring-red-400"
+                  : "border border-transparent"
+              }`}
+            >
+              <span
+                className={`flex h-full w-11 items-center justify-center border-r text-[#b8b8bc] ${
+                  hasError ? "border-red-200" : "border-[#e1e1e6]"
+                }`}
+              >
                 <LockFill size={16} />
               </span>
               <input
                 name="password"
-                type="password"
+                type={showPassword ? "text" : "password"}
                 autoComplete="current-password"
                 required
                 value={password}
-                onChange={(event) => setPassword(event.target.value)}
+                onChange={(event) => {
+                  setPassword(event.target.value);
+                  if (errorMessage) {
+                    setErrorMessage("");
+                  }
+                }}
+                onKeyDown={(event) => setCapsLockOn(event.getModifierState("CapsLock"))}
+                onKeyUp={(event) => setCapsLockOn(event.getModifierState("CapsLock"))}
+                onBlur={() => setCapsLockOn(false)}
                 placeholder="input password here"
                 className="h-full flex-1 bg-transparent px-3 text-sm text-[#4a4a4d] placeholder:text-[#c2c2c7] focus:outline-none"
                 aria-label="Password"
               />
+              <button
+                type="button"
+                onClick={() => setShowPassword((value) => !value)}
+                className="h-full px-3 text-[#8f8f92]"
+                aria-label={showPassword ? "Hide password" : "Show password"}
+              >
+                {showPassword ? <EyeSlash size={16} /> : <Eye size={16} />}
+              </button>
             </div>
+            {capsLockOn ? (
+              <p className="mt-2 text-xs text-[#c06a00]">
+                Caps Lock is on.
+              </p>
+            ) : null}
           </div>
 
           <label className="flex items-center gap-3 text-xs text-[#a6a6ab]">
