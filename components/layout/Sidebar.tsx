@@ -105,41 +105,51 @@ const settingsNavItems: SidebarNavItem[] = [
 ];
 
 const mainTabNavItems: MainTabNavItem[] = [
-  { id: "HomeDashboard", label: "Home", href: "/dashboard/summary", icon: House },
+  {
+    id: "HomeDashboard",
+    label: "Home Dashboard",
+    href: "/dashboard/summary",
+    icon: House
+  },
   {
     id: "RecordsManagement",
-    label: "Records",
+    label: "Records Management",
     href: "/dashboard/records/subtab-1",
     icon: Grid1x2
   },
   {
     id: "CleaningSchedule",
-    label: "Cleaning",
+    label: "Cleaning Schedule",
     href: "/dashboard/cleaning/subtab-1",
     icon: CalendarCheck
   },
   {
     id: "ReportsAnalytics",
-    label: "Reports",
+    label: "Reports Analytics",
     href: "/dashboard/reports/subtab-1",
     icon: BarChart
   },
-  { id: "FlagsMonitoring", label: "Flags", href: "/dashboard/flags/subtab-1", icon: Flag },
+  {
+    id: "FlagsMonitoring",
+    label: "Flags Monitoring",
+    href: "/dashboard/flags/subtab-1",
+    icon: Flag
+  },
   {
     id: "ChangelogHistory",
-    label: "Changelog",
+    label: "System Changelog",
     href: "/dashboard/changelog/subtab-1",
     icon: ClockHistory
   },
   {
     id: "AdminProfile",
-    label: "Profile",
+    label: "Admin Profile",
     href: "/dashboard/profile/subtab-1",
     icon: PersonCircle
   },
   {
     id: "DashboardSettings",
-    label: "Settings",
+    label: "Dashboard Settings",
     href: "/dashboard/settings/subtab-1",
     icon: Gear
   }
@@ -190,8 +200,10 @@ export default function Sidebar({
     DashboardSettings: { label: "Dashboard", title: "Settings" }
   };
   const activeTitle = titleMap[activeMainTab] ?? titleMap.HomeDashboard;
-  const secondarySectionLabel =
-    activeMainTab === "HomeDashboard" ? "Home Links" : "Subtabs";
+  const mainTabSections = mainTabNavItems.map((tab) => ({
+    ...tab,
+    subItems: navItemsByMainTab[tab.id] ?? []
+  }));
 
   useEffect(() => {
     setHasMounted(true);
@@ -265,6 +277,12 @@ export default function Sidebar({
     });
   }, [navItems, router]);
 
+  const handleMobileNavigate = (href: string) => {
+    setOptimisticHref(href);
+    router.push(href);
+    onClose();
+  };
+
   const sidebarContent = (
     <div className="flex h-full flex-col">
       <div className="flex items-center justify-between px-4 pt-6">
@@ -286,44 +304,73 @@ export default function Sidebar({
         </div>
       </div>
 
-      <div className="mt-4 px-4 md:hidden">
-        <div className="text-[11px] uppercase tracking-[0.2em] text-text-muted">
-          Main Tabs
-        </div>
-        <div className="mt-3 grid grid-cols-2 gap-2">
-          {mainTabNavItems.map((tab) => {
-            const Icon = tab.icon;
-            const isActiveMainTab = activeMainTab === tab.id;
+      <nav className="mt-4 flex-1 overflow-y-auto px-3 md:mt-6 md:px-3">
+        <div className="space-y-4 pb-2 md:hidden">
+          {mainTabSections.map((section) => {
+            const Icon = section.icon;
+            const isActiveSection = activeMainTab === section.id;
 
             return (
-              <Link
-                key={tab.id}
-                href={tab.href}
-                prefetch
-                aria-current={isActiveMainTab ? "page" : undefined}
-                className={`flex items-center gap-2 rounded-xl border px-3 py-2 text-xs font-semibold transition ${
-                  isActiveMainTab
-                    ? "border-topbar bg-topbar text-text-on-dark"
-                    : "border-border text-text-on-light hover:bg-shell"
+              <section
+                key={section.id}
+                className={`rounded-2xl border ${
+                  isActiveSection ? "border-topbar/40" : "border-border"
                 }`}
-                onClick={() => {
-                  setOptimisticHref(tab.href);
-                  onClose();
-                }}
               >
-                <Icon size={14} />
-                <span>{tab.label}</span>
-              </Link>
+                <button
+                  type="button"
+                  onClick={() => handleMobileNavigate(section.href)}
+                  className={`flex w-full items-center gap-2 rounded-t-2xl px-3 py-3 text-left text-sm font-semibold transition ${
+                    isActiveSection
+                      ? "bg-topbar text-text-on-dark"
+                      : "text-text-on-light hover:bg-shell"
+                  }`}
+                  aria-current={isActiveSection ? "page" : undefined}
+                >
+                  <Icon size={16} />
+                  <span>{section.label}</span>
+                </button>
+
+                <div className="space-y-1 px-2 pb-2 pt-2">
+                  {section.subItems.map((item) => {
+                    const SubIcon = item.icon;
+                    const href = item.href;
+
+                    if (!href) {
+                      return null;
+                    }
+
+                    const isActiveSubItem = activePath === href;
+
+
+                    return (
+                      <button
+                        key={`${section.id}-${item.label}`}
+                        type="button"
+                        onClick={() => handleMobileNavigate(href)}
+                        className={`flex h-10 w-full items-center gap-2 rounded-xl px-2 text-left text-sm transition ${
+                          isActiveSubItem
+                            ? "bg-topbar/85 text-text-on-dark"
+                            : "text-text-on-light hover:bg-shell"
+                        }`}
+                      >
+                        <SubIcon size={14} />
+                        <span className="truncate">{item.label}</span>
+                        {item.badge ? (
+                          <span className="ml-auto">
+                            <Badge label={item.badge} />
+                          </span>
+                        ) : null}
+                      </button>
+                    );
+                  })}
+                </div>
+              </section>
             );
           })}
         </div>
-      </div>
 
-      <nav className="mt-6 flex-1 px-3">
-        <div className="px-2 pb-2 text-[11px] uppercase tracking-[0.2em] text-text-muted md:hidden">
-          {secondarySectionLabel}
-        </div>
-        <div className="relative p-2">
+        <div className="relative hidden p-2 md:block">
           {activeIndex >= 0 ? (
             <span
               className={`pointer-events-none absolute h-11 bg-topbar ${
