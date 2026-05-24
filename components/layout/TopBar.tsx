@@ -1,25 +1,48 @@
 "use client";
 
 import { Bell, List, ThermometerHigh } from "react-bootstrap-icons";
-import { useClock } from "@/hooks/useClock";
+import { useLiveConditions } from "@/hooks/useLiveConditions";
 
 interface TopBarProps {
   onMenuClick: () => void;
 }
 
+const FALLBACK_TIMEZONE = "Asia/Manila";
+const FALLBACK_LOCATION = "Metro Manila";
+
+function formatTemperature(value: number | undefined) {
+  if (typeof value !== "number" || Number.isNaN(value)) {
+    return "--°C";
+  }
+
+  return `${Math.round(value)}°C`;
+}
+
 export default function TopBar({ onMenuClick }: TopBarProps) {
-  const time = useClock();
-  const displayDate = time;
-  const dayName = displayDate.toLocaleDateString("en-US", { weekday: "long" });
-  const dateLabel = displayDate.toLocaleDateString("en-GB", {
+  const { conditions, now, error } = useLiveConditions();
+  const timezone = conditions?.timezone || FALLBACK_TIMEZONE;
+  const dayName = now.toLocaleDateString("en-US", {
+    weekday: "long",
+    timeZone: timezone
+  });
+  const dateLabel = now.toLocaleDateString("en-GB", {
     day: "2-digit",
     month: "long",
-    year: "numeric"
+    year: "numeric",
+    timeZone: timezone
   });
-  const timeLabel = time.toLocaleTimeString("en-US", {
+  const timeLabel = now.toLocaleTimeString("en-US", {
     hour: "2-digit",
-    minute: "2-digit"
+    minute: "2-digit",
+    timeZone: timezone
   });
+  const weatherSummary = error
+    ? "Live weather data unavailable."
+    : conditions?.weatherSummary || "Loading live weather...";
+  const weatherLabel = conditions?.weatherLabel || "Loading weather";
+  const temperatureLabel = formatTemperature(conditions?.temperatureC);
+  const locationLabel = conditions?.locationName || FALLBACK_LOCATION;
+  const timezoneLabel = conditions?.timezoneAbbreviation || "GMT+8";
 
   return (
     <header className="w-full bg-topbar text-text-on-dark">
@@ -57,22 +80,20 @@ export default function TopBar({ onMenuClick }: TopBarProps) {
             <div className="text-2xl font-semibold">{dayName}</div>
             <div className="mt-1 flex items-center gap-2 text-xs text-accent-orange">
               <ThermometerHigh size={12} />
-              Weather alert: Heat advisory
+              {weatherSummary}
             </div>
           </div>
           <div>
             <div className="text-lg font-medium">{dateLabel}</div>
-            <div className="text-xs text-text-on-dark/70">Partly sunny</div>
+            <div className="text-xs text-text-on-dark/70">{weatherLabel}</div>
           </div>
           <div>
             <div className="text-lg font-medium">{timeLabel}</div>
-            <div className="text-xs text-text-on-dark/70">32 degree C</div>
+            <div className="text-xs text-text-on-dark/70">{temperatureLabel}</div>
           </div>
           <div className="hidden lg:block">
-            <div className="text-lg font-medium">Metro Manila (GMT+8)</div>
-            <div className="text-xs text-text-on-dark/70">
-              Philippine Standard Time
-            </div>
+            <div className="text-lg font-medium">{`${locationLabel} (${timezoneLabel})`}</div>
+            <div className="text-xs text-text-on-dark/70">{timezone}</div>
           </div>
         </div>
       </div>

@@ -21,8 +21,13 @@ const themeInitScript = `
 `;
 
 export const metadata: Metadata = {
-  title: "Home Dashboard",
-  description: "Hospitality and venue management dashboard"
+  title: "Admin | Serenity Cove Private Resort",
+  description: "Hospitality and venue management dashboard",
+  icons: {
+    icon: "/icons/sc-logo.png",
+    shortcut: "/icons/sc-logo.png",
+    apple: "/icons/sc-logo.png"
+  }
 };
 
 export default function RootLayout({
