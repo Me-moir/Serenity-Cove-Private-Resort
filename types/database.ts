@@ -28,7 +28,8 @@ export interface AdminSession {
 
 export interface Guest {
   guest_id: number;
-  guest_name: string;
+  first_name: string;
+  last_name: string;
   guest_type: "New" | "Returning" | "VIP";
   contact_number: string | null;
   email: string | null;
@@ -56,7 +57,7 @@ export interface Reservation {
 }
 
 export interface ReservationWithGuest extends Reservation {
-  guests: Pick<Guest, "guest_name" | "guest_type"> | null;
+  guests: Pick<Guest, "first_name" | "last_name" | "guest_type"> | null;
 }
 
 export interface ReservationAddon {
@@ -94,7 +95,7 @@ export interface Incident {
 }
 
 export interface IncidentWithGuest extends Incident {
-  guests: Pick<Guest, "guest_name"> | null;
+  guests: Pick<Guest, "first_name" | "last_name"> | null;
   reservations: Pick<Reservation, "order_id"> | null;
 }
 
@@ -148,7 +149,7 @@ export interface Review {
 }
 
 export interface ReviewWithGuest extends Review {
-  guests: Pick<Guest, "guest_name"> | null;
+  guests: Pick<Guest, "first_name" | "last_name"> | null;
   reservations: Pick<Reservation, "order_id"> | null;
 }
 

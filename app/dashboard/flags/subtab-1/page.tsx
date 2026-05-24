@@ -30,7 +30,7 @@ export default async function FlagsSubtab1Page() {
               <article key={inc.incident_id} className="rounded-2xl border border-border p-4">
                 <div className="flex items-start justify-between gap-3">
                   <div>
-                    <h2 className="text-sm font-semibold">{inc.guests?.guest_name ?? "Unknown Guest"}</h2>
+                    <h2 className="text-sm font-semibold">{inc.guests ? `${inc.guests.first_name} ${inc.guests.last_name}` : "Unknown Guest"}</h2>
                     {inc.reservations?.order_id && (
                       <div className="mt-0.5 font-mono text-[10px] text-text-muted">
                         {inc.reservations.order_id}

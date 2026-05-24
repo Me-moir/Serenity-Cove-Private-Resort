@@ -13,7 +13,7 @@ export default async function ReservationPage() {
       .order("created_at", { ascending: false }),
     supabase
       .from("guests")
-      .select("guest_id, guest_name, guest_type")
+      .select("guest_id, first_name, last_name, guest_type")
       .order("guest_name"),
   ]);
 

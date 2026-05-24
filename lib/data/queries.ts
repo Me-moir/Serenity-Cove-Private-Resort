@@ -1,4 +1,4 @@
-import { createSupabaseServerClient } from "@/lib/supabase/server";
+import { createSupabaseServiceClient } from "@/lib/supabase/service";
 import type {
   CalendarEventWithReservation,
   CleaningTaskWithRelations,
@@ -14,7 +14,7 @@ import type {
 } from "@/types/database";
 
 export async function getGuestStats(): Promise<GuestStats> {
-  const supabase = createSupabaseServerClient();
+  const supabase = createSupabaseServiceClient();
   const { data, error } = await supabase
     .from("guests")
     .select("guest_type");
@@ -33,7 +33,7 @@ export async function getGuestStats(): Promise<GuestStats> {
 }
 
 export async function getFinanceSummary(): Promise<FinanceSummary> {
-  const supabase = createSupabaseServerClient();
+  const supabase = createSupabaseServiceClient();
   const { data, error } = await supabase
     .from("financial_records")
     .select("record_type, amount");
@@ -54,7 +54,7 @@ export async function getFinanceSummary(): Promise<FinanceSummary> {
 }
 
 export async function getGuests(): Promise<Guest[]> {
-  const supabase = createSupabaseServerClient();
+  const supabase = createSupabaseServiceClient();
   const { data, error } = await supabase
     .from("guests")
     .select("*")
@@ -65,10 +65,10 @@ export async function getGuests(): Promise<Guest[]> {
 }
 
 export async function getReservations(): Promise<ReservationWithGuest[]> {
-  const supabase = createSupabaseServerClient();
+  const supabase = createSupabaseServiceClient();
   const { data, error } = await supabase
     .from("reservations")
-    .select("*, guests(guest_name, guest_type)")
+    .select("*, guests(first_name, last_name, guest_type)")
     .order("created_at", { ascending: false });
 
   if (error || !data) return [];
@@ -76,10 +76,10 @@ export async function getReservations(): Promise<ReservationWithGuest[]> {
 }
 
 export async function getReviews(): Promise<ReviewWithGuest[]> {
-  const supabase = createSupabaseServerClient();
+  const supabase = createSupabaseServiceClient();
   const { data, error } = await supabase
     .from("reviews")
-    .select("*, guests(guest_name), reservations(order_id)")
+    .select("*, guests(first_name, last_name), reservations(order_id)")
     .order("review_date", { ascending: false });
 
   if (error || !data) return [];
@@ -89,7 +89,7 @@ export async function getReviews(): Promise<ReviewWithGuest[]> {
 export async function getCleaningTasks(
   statuses?: string[]
 ): Promise<CleaningTaskWithRelations[]> {
-  const supabase = createSupabaseServerClient();
+  const supabase = createSupabaseServiceClient();
   let query = supabase
     .from("cleaning_tasks")
     .select("*, reservations(order_id), staff(staff_name)")
@@ -105,7 +105,7 @@ export async function getCleaningTasks(
 }
 
 export async function getFinancialRecords(): Promise<FinancialRecordWithReservation[]> {
-  const supabase = createSupabaseServerClient();
+  const supabase = createSupabaseServiceClient();
   const { data, error } = await supabase
     .from("financial_records")
     .select("*, reservations(order_id)")
@@ -116,10 +116,10 @@ export async function getFinancialRecords(): Promise<FinancialRecordWithReservat
 }
 
 export async function getIncidents(): Promise<IncidentWithGuest[]> {
-  const supabase = createSupabaseServerClient();
+  const supabase = createSupabaseServiceClient();
   const { data, error } = await supabase
     .from("incidents")
-    .select("*, guests(guest_name), reservations(order_id)")
+    .select("*, guests(first_name, last_name), reservations(order_id)")
     .order("reported_at", { ascending: false });
 
   if (error || !data) return [];
@@ -127,7 +127,7 @@ export async function getIncidents(): Promise<IncidentWithGuest[]> {
 }
 
 export async function getReservationAddons(): Promise<ReservationAddonWithReservation[]> {
-  const supabase = createSupabaseServerClient();
+  const supabase = createSupabaseServiceClient();
   const { data, error } = await supabase
     .from("reservation_addons")
     .select("*, reservations(order_id)")
@@ -138,7 +138,7 @@ export async function getReservationAddons(): Promise<ReservationAddonWithReserv
 }
 
 export async function getCalendarEvents(): Promise<CalendarEventWithReservation[]> {
-  const supabase = createSupabaseServerClient();
+  const supabase = createSupabaseServiceClient();
   const { data, error } = await supabase
     .from("calendar_events")
     .select("*, reservations(order_id)")
@@ -149,7 +149,7 @@ export async function getCalendarEvents(): Promise<CalendarEventWithReservation[
 }
 
 export async function getStaff(): Promise<Staff[]> {
-  const supabase = createSupabaseServerClient();
+  const supabase = createSupabaseServiceClient();
   const { data, error } = await supabase
     .from("staff")
     .select("*")
@@ -160,7 +160,7 @@ export async function getStaff(): Promise<Staff[]> {
 }
 
 export async function getReservationStats() {
-  const supabase = createSupabaseServerClient();
+  const supabase = createSupabaseServiceClient();
   const { data, error } = await supabase
     .from("reservations")
     .select("approval_status, payment_status, booking_source, adult_count, children_count, total_price");

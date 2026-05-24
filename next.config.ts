@@ -2,9 +2,13 @@ import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
   images: {
-    // Add Supabase storage domains here when available.
     domains: []
-  }
+  },
+  experimental: {
+    staleTimes: {
+      dynamic: 0,
+    },
+  },
 };
 
 export default nextConfig;

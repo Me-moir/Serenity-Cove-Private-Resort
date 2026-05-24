@@ -36,13 +36,14 @@ interface Reservation {
   booking_source: string;
   special_notes: string | null;
   created_at: string;
-  guests: { guest_name: string; guest_type: string } | null;
+  guests: { first_name: string; last_name: string; guest_type: string } | null;
   reservation_addons: Addon[];
 }
 
 interface GuestOption {
   guest_id: number;
-  guest_name: string;
+  first_name: string;
+  last_name: string;
   guest_type: string;
 }
 
@@ -189,7 +190,7 @@ export default function ReservationApproval({ reservations, guests }: Props) {
     if (!q) return reservations;
     return reservations.filter(
       (r) =>
-        r.guests?.guest_name.toLowerCase().includes(q) ||
+        `${r.guests?.first_name} ${r.guests?.last_name}`.toLowerCase().includes(q) ||
         r.order_id.toLowerCase().includes(q) ||
         r.guests?.guest_type.toLowerCase().includes(q) ||
         r.payment_status.toLowerCase().includes(q) ||
@@ -394,7 +395,7 @@ export default function ReservationApproval({ reservations, guests }: Props) {
                       {/* Guest Name */}
                       <td className="py-4 pl-6 pr-4">
                         <span className="font-semibold text-sm leading-tight">
-                          {res.guests?.guest_name ?? "—"}
+                          {res.guests ? `${res.guests.first_name} ${res.guests.last_name}` : "—"}
                         </span>
                       </td>
 
@@ -561,7 +562,7 @@ export default function ReservationApproval({ reservations, guests }: Props) {
                         <option value="">Select a guest...</option>
                         {guests.map((g) => (
                           <option key={g.guest_id} value={g.guest_id}>
-                            {g.guest_name} · {g.guest_type}
+                            {g.first_name} {g.last_name} · {g.guest_type}
                           </option>
                         ))}
                       </select>

@@ -25,7 +25,7 @@ export default async function RecordsSubtab3Page() {
             <article key={inc.incident_id} className="rounded-2xl border border-border p-4">
               <div className="flex items-start justify-between gap-4">
                 <div>
-                  <div className="font-medium">{inc.guests?.guest_name ?? "Unknown Guest"}</div>
+                  <div className="font-medium">{inc.guests ? `${inc.guests.first_name} ${inc.guests.last_name}` : "Unknown Guest"}</div>
                   {inc.reservations?.order_id && (
                     <div className="mt-0.5 font-mono text-[10px] text-text-muted">
                       {inc.reservations.order_id}

@@ -40,7 +40,7 @@ export default async function ReviewsPage() {
             <article key={review.review_id} className="rounded-2xl border border-border p-4">
               <div className="flex items-start justify-between gap-4">
                 <div>
-                  <div className="font-medium">{review.guests?.guest_name ?? "Unknown Guest"}</div>
+                  <div className="font-medium">{review.guests ? `${review.guests.first_name} ${review.guests.last_name}` : "Unknown Guest"}</div>
                   {review.reservations?.order_id && (
                     <div className="mt-0.5 font-mono text-[10px] text-text-muted">
                       {review.reservations.order_id}

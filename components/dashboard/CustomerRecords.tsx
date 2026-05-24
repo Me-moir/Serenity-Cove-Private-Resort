@@ -7,13 +7,14 @@ import {
   ChevronRight,
   EnvelopeFill,
   Funnel,
-  PeopleFill,
+  PencilFill,
   PlusLg,
   Search,
   TelephoneFill,
+  TrashFill,
   X,
 } from "react-bootstrap-icons";
-import { addGuest, updateGuest } from "@/app/actions/guests";
+import { addGuest, updateGuest, deleteGuest } from "@/app/actions/guests";
 
 /* ─── Types ──────────────────────────────────────────────────────────── */
 
@@ -34,7 +35,8 @@ interface IncidentRef {
 
 interface Guest {
   guest_id: number;
-  guest_name: string;
+  first_name: string;
+  last_name: string;
   guest_type: "New" | "Returning" | "VIP";
   contact_number: string | null;
   email: string | null;
@@ -52,12 +54,12 @@ interface Props {
 /* ─── Constants ──────────────────────────────────────────────────────── */
 
 const PAGE_SIZE = 10;
-const MONTHS = ["JAN","FEB","MAR","APR","MAY","JUN","JUL","AUG","SEP","OCT","NOV","DEC"];
 
 const BLANK_FORM = {
-  guest_name: "",
+  first_name: "",
+  last_name: "",
   guest_type: "New" as "New" | "Returning" | "VIP",
-  contact_number: "",
+  contact_number: "+63",
   email: "",
   total_bookings: "0",
   last_stay: "",
@@ -69,8 +71,8 @@ function fmtId(id: number) {
   return `#${String(id).padStart(7, "0")}`;
 }
 
-function toDateStr(d: Date) {
-  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
+function fullName(g: Guest) {
+  return `${g.first_name} ${g.last_name}`;
 }
 
 function getPageNums(cur: number, total: number): (number | "…")[] {
@@ -91,15 +93,13 @@ function getIncidentBadge(incidents: IncidentRef[]) {
   return latest.status;
 }
 
+function isValidEmail(email: string) {
+  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+}
+
 /* ─── Badge components ───────────────────────────────────────────────── */
 
 function IncidentBadge({ status }: { status: string }) {
-  if (status === "None" || status === "none")
-    return (
-      <span className="inline-flex items-center rounded-full border border-border px-3 py-1 text-[9px] font-bold uppercase tracking-[0.22em] text-text-muted">
-        None
-      </span>
-    );
   if (status === "Reported")
     return (
       <span className="inline-flex items-center rounded-full bg-topbar px-3 py-1 text-[9px] font-bold uppercase tracking-[0.22em] text-white">
@@ -126,21 +126,21 @@ function IncidentBadge({ status }: { status: string }) {
 }
 
 function ResolutionBadge({ status }: { status: string }) {
-  if (status === "None" || status === "none" || !status)
-    return (
-      <span className="inline-flex items-center rounded-full border border-border px-3 py-1 text-[9px] font-bold uppercase tracking-[0.22em] text-text-muted">
-        N/A
-      </span>
-    );
   if (status === "Resolved")
     return (
       <span className="inline-flex items-center rounded-full bg-accent-green px-3 py-1 text-[9px] font-bold uppercase tracking-[0.22em] text-white">
         Resolved
       </span>
     );
+  if (status !== "None" && status !== "none" && status)
+    return (
+      <span className="inline-flex items-center rounded-full bg-accent-orange px-3 py-1 text-[9px] font-bold uppercase tracking-[0.22em] text-white">
+        Pending
+      </span>
+    );
   return (
-    <span className="inline-flex items-center rounded-full bg-accent-orange px-3 py-1 text-[9px] font-bold uppercase tracking-[0.22em] text-white">
-      Pending
+    <span className="inline-flex items-center rounded-full border border-border px-3 py-1 text-[9px] font-bold uppercase tracking-[0.22em] text-text-muted">
+      N/A
     </span>
   );
 }
@@ -162,6 +162,8 @@ function GuestTypePill({ type }: { type: string }) {
 
 const inputCls =
   "h-10 w-full rounded-xl border border-border bg-shell px-3 text-sm text-text-on-light placeholder:text-text-muted/50 focus:border-[#9a9a9a] focus:outline-none transition";
+const inputErrCls =
+  "h-10 w-full rounded-xl border border-accent-red bg-shell px-3 text-sm text-text-on-light placeholder:text-text-muted/50 focus:border-accent-red focus:outline-none transition";
 const selectCls =
   "h-10 w-full rounded-xl border border-border bg-shell px-3 text-sm text-text-on-light focus:border-[#9a9a9a] focus:outline-none transition appearance-none";
 
@@ -175,63 +177,24 @@ export default function CustomerRecords({ guests }: Props) {
   const router = useRouter();
   const [, startTransition] = useTransition();
 
-  const today = new Date();
-  const todayStr = toDateStr(today);
-
   /* UI state */
   const [search, setSearch] = useState("");
   const [filterType, setFilterType] = useState("All");
   const [showFilter, setShowFilter] = useState(false);
   const [page, setPage] = useState(1);
-  const [selMonth, setSelMonth] = useState({ y: today.getFullYear(), m: today.getMonth() });
+
+  /* Modal state */
   const [showAdd, setShowAdd] = useState(false);
   const [editGuest, setEditGuest] = useState<Guest | null>(null);
   const [contactGuest, setContactGuest] = useState<Guest | null>(null);
+  const [deleteTarget, setDeleteTarget] = useState<Guest | null>(null);
+
+  /* Form state */
   const [form, setForm] = useState(BLANK_FORM);
+  const [emailError, setEmailError] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [formError, setFormError] = useState("");
-
-  /* Monthly stats */
-  const monthlyStats = useMemo(() => {
-    const newClients = guests.filter((g) => {
-      if (g.guest_type !== "New") return false;
-      const d = new Date(g.created_at);
-      return d.getFullYear() === selMonth.y && d.getMonth() === selMonth.m;
-    }).length;
-
-    const returningClients = guests.filter((g) => {
-      if (g.guest_type !== "Returning") return false;
-      return g.reservations.some((r) => {
-        const d = new Date(r.check_in_date + "T00:00:00");
-        return d.getFullYear() === selMonth.y && d.getMonth() === selMonth.m;
-      });
-    }).length;
-
-    let incidentReports = 0;
-    let incidentsResolved = 0;
-    for (const g of guests) {
-      for (const inc of g.incidents) {
-        const rpt = new Date(inc.reported_at);
-        if (rpt.getFullYear() === selMonth.y && rpt.getMonth() === selMonth.m) incidentReports++;
-        if (inc.resolved_at) {
-          const res = new Date(inc.resolved_at);
-          if (res.getFullYear() === selMonth.y && res.getMonth() === selMonth.m) incidentsResolved++;
-        }
-      }
-    }
-    return { newClients, returningClients, incidentReports, incidentsResolved };
-  }, [guests, selMonth]);
-
-  /* Ongoing stay today */
-  const ongoingStay = useMemo(() => {
-    for (const g of guests) {
-      const res = g.reservations.find(
-        (r) => r.check_in_date <= todayStr && r.check_out_date >= todayStr,
-      );
-      if (res) return { guest: g, pax: res.adult_count + res.children_count };
-    }
-    return null;
-  }, [guests, todayStr]);
+  const [deleting, setDeleting] = useState(false);
 
   /* Filtered rows */
   const filtered = useMemo(() => {
@@ -240,7 +203,7 @@ export default function CustomerRecords({ guests }: Props) {
       if (filterType !== "All" && g.guest_type !== filterType) return false;
       if (!q) return true;
       return (
-        g.guest_name.toLowerCase().includes(q) ||
+        fullName(g).toLowerCase().includes(q) ||
         fmtId(g.guest_id).includes(q) ||
         g.guest_type.toLowerCase().includes(q) ||
         g.reservations.some((r) => r.order_id.toLowerCase().includes(q))
@@ -256,37 +219,28 @@ export default function CustomerRecords({ guests }: Props) {
     setPage(Math.max(1, Math.min(p, totalPages)));
   }
 
-  /* Month navigation */
-  function prevMonth() {
-    setSelMonth((p) =>
-      p.m === 0 ? { y: p.y - 1, m: 11 } : { y: p.y, m: p.m - 1 },
-    );
-  }
-  function nextMonth() {
-    setSelMonth((p) =>
-      p.m === 11 ? { y: p.y + 1, m: 0 } : { y: p.y, m: p.m + 1 },
-    );
-  }
-
   /* Form helpers */
   const setF = (k: string, v: string) => setForm((p) => ({ ...p, [k]: v }));
 
   function openAdd() {
     setForm(BLANK_FORM);
     setFormError("");
+    setEmailError(false);
     setShowAdd(true);
   }
 
   function openEdit(g: Guest) {
     setForm({
-      guest_name: g.guest_name,
+      first_name: g.first_name,
+      last_name: g.last_name,
       guest_type: g.guest_type,
-      contact_number: g.contact_number ?? "",
+      contact_number: g.contact_number ?? "+63",
       email: g.email ?? "",
       total_bookings: String(g.total_bookings),
       last_stay: g.last_stay ?? "",
     });
     setFormError("");
+    setEmailError(false);
     setEditGuest(g);
   }
 
@@ -295,18 +249,43 @@ export default function CustomerRecords({ guests }: Props) {
     setEditGuest(null);
     setForm(BLANK_FORM);
     setFormError("");
+    setEmailError(false);
+  }
+
+  function handlePhoneChange(val: string) {
+    if (!val.startsWith("+63")) {
+      setF("contact_number", "+63");
+    } else {
+      setF("contact_number", val);
+    }
+  }
+
+  function handleEmailChange(val: string) {
+    setF("email", val);
+    if (val && !isValidEmail(val)) {
+      setEmailError(true);
+    } else {
+      setEmailError(false);
+    }
   }
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
-    if (!form.guest_name.trim()) return setFormError("Guest name is required.");
+    if (!form.first_name.trim()) return setFormError("First name is required.");
+    if (!form.last_name.trim()) return setFormError("Last name is required.");
+    if (form.email.trim() && !isValidEmail(form.email.trim())) {
+      setEmailError(true);
+      return setFormError("Please enter a valid email address.");
+    }
     setSubmitting(true);
     setFormError("");
 
+    const contactVal = form.contact_number.trim();
     const payload = {
-      guest_name: form.guest_name.trim(),
+      first_name: form.first_name.trim(),
+      last_name: form.last_name.trim(),
       guest_type: form.guest_type,
-      contact_number: form.contact_number.trim() || null,
+      contact_number: contactVal === "+63" || contactVal === "" ? null : contactVal,
       email: form.email.trim() || null,
       total_bookings: Number(form.total_bookings) || 0,
       last_stay: form.last_stay || null,
@@ -327,10 +306,19 @@ export default function CustomerRecords({ guests }: Props) {
     }
   }
 
-  /* Ongoing stay date label */
-  const todayLabel = today.toLocaleDateString("en-US", {
-    month: "short", day: "numeric", year: "numeric",
-  }).toUpperCase();
+  async function handleDelete() {
+    if (!deleteTarget) return;
+    setDeleting(true);
+    try {
+      await deleteGuest(deleteTarget.guest_id);
+      setDeleteTarget(null);
+      startTransition(() => router.refresh());
+    } catch (err) {
+      console.error(err);
+    } finally {
+      setDeleting(false);
+    }
+  }
 
   /* ─── Render ──────────────────────────────────────────────────────── */
 
@@ -341,87 +329,6 @@ export default function CustomerRecords({ guests }: Props) {
       <h1 className="text-3xl font-bold tracking-tight text-text-on-light">
         Customer <span className="font-light text-text-muted">Records</span>
       </h1>
-
-      {/* ── Stat cards row ─────────────────────────────────────────────── */}
-      <div className="grid gap-4 lg:grid-cols-[auto_1fr_auto]">
-
-        {/* Total clients */}
-        <div className="flex min-w-[180px] items-center gap-4 rounded-2xl border border-border bg-card-light p-5 shadow-sm">
-          <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-shell text-text-muted">
-            <PeopleFill size={22} />
-          </div>
-          <div>
-            <div className="text-4xl font-bold tabular-nums leading-none">
-              {guests.length.toLocaleString()}
-            </div>
-            <div className="mt-1 text-[10px] font-semibold uppercase tracking-[0.22em] text-text-muted">
-              Total Clients
-            </div>
-          </div>
-        </div>
-
-        {/* Monthly stats */}
-        <div className="rounded-2xl border border-border bg-card-light shadow-sm">
-          {/* Month selector */}
-          <div className="flex items-center gap-3 border-b border-border px-5 py-3">
-            <button
-              type="button"
-              onClick={prevMonth}
-              className="flex h-7 w-7 items-center justify-center rounded-lg border border-border text-text-muted transition hover:border-[#9a9a9a] hover:text-text-on-light"
-            >
-              <ChevronLeft size={12} />
-            </button>
-            <span className="text-sm font-bold uppercase tracking-[0.25em]">
-              {MONTHS[selMonth.m]} {selMonth.y}
-            </span>
-            <button
-              type="button"
-              onClick={nextMonth}
-              className="flex h-7 w-7 items-center justify-center rounded-lg border border-border text-text-muted transition hover:border-[#9a9a9a] hover:text-text-on-light"
-            >
-              <ChevronRight size={12} />
-            </button>
-          </div>
-          {/* Stats row */}
-          <div className="grid grid-cols-4 divide-x divide-border px-2 py-4">
-            {[
-              { val: monthlyStats.newClients, label: "New\nClients" },
-              { val: monthlyStats.returningClients, label: "Returning\nClients" },
-              { val: monthlyStats.incidentReports, label: "Incident\nReports" },
-              { val: monthlyStats.incidentsResolved, label: "Incidents\nResolved" },
-            ].map((s) => (
-              <div key={s.label} className="flex flex-col items-center gap-1 px-4">
-                <div className="text-3xl font-bold tabular-nums leading-none">{s.val}</div>
-                <div className="whitespace-pre-line text-center text-[9px] font-semibold uppercase leading-tight tracking-[0.2em] text-text-muted">
-                  {s.label}
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-
-        {/* Ongoing stay today */}
-        <div className="flex min-w-[200px] flex-col justify-center rounded-2xl border border-border bg-card-light p-5 shadow-sm">
-          <div className="text-[9px] font-bold uppercase tracking-[0.28em] text-text-muted">
-            Ongoing Stay Today
-          </div>
-          <div className="mt-1 text-[10px] font-semibold uppercase tracking-[0.2em] text-accent-orange">
-            {todayLabel}
-          </div>
-          {ongoingStay ? (
-            <>
-              <div className="mt-2 text-base font-bold leading-tight">
-                {ongoingStay.guest.guest_name}
-              </div>
-              <div className="mt-1 text-xs font-semibold uppercase tracking-[0.2em] text-text-muted">
-                {ongoingStay.pax} PAX
-              </div>
-            </>
-          ) : (
-            <div className="mt-2 text-sm text-text-muted">No ongoing stay</div>
-          )}
-        </div>
-      </div>
 
       {/* ── Table card ─────────────────────────────────────────────────── */}
       <div className="overflow-hidden rounded-3xl bg-card-light shadow-sm">
@@ -572,7 +479,7 @@ export default function CustomerRecords({ guests }: Props) {
                     <tr key={guest.guest_id} className="transition-colors hover:bg-shell/60">
                       {/* Guest Name */}
                       <td className="py-4 pl-6 pr-4">
-                        <span className="text-sm font-semibold">{guest.guest_name}</span>
+                        <span className="text-sm font-semibold">{fullName(guest)}</span>
                       </td>
 
                       {/* Customer ID */}
@@ -614,19 +521,24 @@ export default function CustomerRecords({ guests }: Props) {
 
                       {/* Actions */}
                       <td className="py-4 pl-4 pr-6">
-                        <div className="flex items-center gap-3">
+                        <div className="flex items-center gap-1">
+
+                          {/* Contact */}
                           <div className="relative">
                             <button
                               type="button"
-                              onClick={() =>
-                                setContactGuest(isContactOpen ? null : guest)
-                              }
-                              className="text-xs font-semibold uppercase tracking-[0.18em] text-text-muted underline-offset-2 transition hover:text-text-on-light hover:underline"
+                              title="Contact info"
+                              onClick={() => setContactGuest(isContactOpen ? null : guest)}
+                              className={`flex h-8 w-8 items-center justify-center rounded-lg border transition ${
+                                isContactOpen
+                                  ? "border-topbar bg-topbar text-white"
+                                  : "border-border text-text-muted hover:border-topbar hover:bg-topbar hover:text-white"
+                              }`}
                             >
-                              Contact
+                              <TelephoneFill size={12} />
                             </button>
                             {isContactOpen && (
-                              <div className="absolute bottom-full left-0 z-20 mb-2 w-56 overflow-hidden rounded-2xl border border-border bg-card-light shadow-lg">
+                              <div className="absolute bottom-full right-0 z-20 mb-2 w-56 overflow-hidden rounded-2xl border border-border bg-card-light shadow-lg">
                                 <div className="flex items-center justify-between border-b border-border px-4 py-2.5">
                                   <span className="text-[10px] font-bold uppercase tracking-[0.22em] text-text-muted">
                                     Contact Info
@@ -656,14 +568,27 @@ export default function CustomerRecords({ guests }: Props) {
                               </div>
                             )}
                           </div>
-                          <span className="text-border">|</span>
+
+                          {/* Edit */}
                           <button
                             type="button"
+                            title="Edit guest"
                             onClick={() => openEdit(guest)}
-                            className="text-xs font-semibold uppercase tracking-[0.18em] text-text-muted underline-offset-2 transition hover:text-text-on-light hover:underline"
+                            className="flex h-8 w-8 items-center justify-center rounded-lg border border-border text-text-muted transition hover:border-accent-blue hover:bg-accent-blue/10 hover:text-accent-blue"
                           >
-                            Edit
+                            <PencilFill size={12} />
                           </button>
+
+                          {/* Delete */}
+                          <button
+                            type="button"
+                            title="Delete guest"
+                            onClick={() => setDeleteTarget(guest)}
+                            className="flex h-8 w-8 items-center justify-center rounded-lg border border-border text-text-muted transition hover:border-accent-red hover:bg-accent-red/10 hover:text-accent-red"
+                          >
+                            <TrashFill size={12} />
+                          </button>
+
                         </div>
                       </td>
                     </tr>
@@ -686,6 +611,62 @@ export default function CustomerRecords({ guests }: Props) {
           </span>
         </div>
       </div>
+
+      {/* ── Delete Confirmation Modal ─────────────────────────────────── */}
+      {deleteTarget && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 px-4 backdrop-blur-[2px]">
+          <div className="w-full max-w-sm overflow-hidden rounded-3xl bg-card-light shadow-[0_32px_80px_rgba(0,0,0,0.3)]">
+            {/* Header */}
+            <div className="flex items-center gap-3 bg-accent-red/10 px-6 py-5">
+              <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-accent-red/15 text-accent-red">
+                <TrashFill size={16} />
+              </div>
+              <div>
+                <div className="text-[10px] font-semibold uppercase tracking-[0.28em] text-accent-red/70">
+                  Confirm Delete
+                </div>
+                <div className="mt-0.5 text-base font-semibold text-text-on-light">
+                  Delete Guest Record
+                </div>
+              </div>
+            </div>
+
+            {/* Body */}
+            <div className="px-6 py-5">
+              <p className="text-sm text-text-muted">
+                You are about to permanently delete{" "}
+                <span className="font-semibold text-text-on-light">
+                  {fullName(deleteTarget)}
+                </span>
+                . This action cannot be undone.
+              </p>
+              <div className="mt-3 rounded-xl border border-accent-red/20 bg-accent-red/5 px-4 py-3 text-xs text-accent-red">
+                All linked reservations and incidents will lose their guest reference.
+              </div>
+            </div>
+
+            {/* Actions */}
+            <div className="flex justify-end gap-3 border-t border-border px-6 py-4">
+              <button
+                type="button"
+                onClick={() => setDeleteTarget(null)}
+                disabled={deleting}
+                className="rounded-xl border border-border px-5 py-2.5 text-sm text-text-muted transition hover:border-[#9a9a9a] hover:text-text-on-light disabled:opacity-50"
+              >
+                Cancel
+              </button>
+              <button
+                type="button"
+                onClick={handleDelete}
+                disabled={deleting}
+                className="rounded-xl bg-accent-red px-6 py-2.5 text-sm font-semibold text-white transition hover:opacity-80 disabled:opacity-50"
+              >
+                {deleting ? "Deleting..." : "Yes, Delete"}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* ── Add / Edit Modal ──────────────────────────────────────────── */}
       {(showAdd || editGuest) && (
@@ -720,14 +701,25 @@ export default function CustomerRecords({ guests }: Props) {
                     Identity
                   </legend>
                   <div className="grid gap-4 sm:grid-cols-2">
-                    <div className="sm:col-span-2">
-                      <FL>Guest Name</FL>
+                    <div>
+                      <FL>First Name</FL>
                       <input
                         required
                         type="text"
-                        value={form.guest_name}
-                        onChange={(e) => setF("guest_name", e.target.value)}
-                        placeholder="Full name"
+                        value={form.first_name}
+                        onChange={(e) => setF("first_name", e.target.value)}
+                        placeholder="First name"
+                        className={inputCls}
+                      />
+                    </div>
+                    <div>
+                      <FL>Last Name</FL>
+                      <input
+                        required
+                        type="text"
+                        value={form.last_name}
+                        onChange={(e) => setF("last_name", e.target.value)}
+                        placeholder="Last name"
                         className={inputCls}
                       />
                     </div>
@@ -767,20 +759,28 @@ export default function CustomerRecords({ guests }: Props) {
                       <input
                         type="tel"
                         value={form.contact_number}
-                        onChange={(e) => setF("contact_number", e.target.value)}
+                        onChange={(e) => handlePhoneChange(e.target.value)}
                         placeholder="+63 9XX XXX XXXX"
                         className={inputCls}
                       />
+                      <p className="mt-1 text-[10px] text-text-muted">
+                        Must start with +63
+                      </p>
                     </div>
                     <div>
                       <FL>Email Address</FL>
                       <input
                         type="email"
                         value={form.email}
-                        onChange={(e) => setF("email", e.target.value)}
+                        onChange={(e) => handleEmailChange(e.target.value)}
                         placeholder="email@example.com"
-                        className={inputCls}
+                        className={emailError ? inputErrCls : inputCls}
                       />
+                      {emailError && (
+                        <p className="mt-1 text-[10px] text-accent-red">
+                          Enter a valid email address.
+                        </p>
+                      )}
                     </div>
                   </div>
                 </fieldset>
@@ -817,7 +817,7 @@ export default function CustomerRecords({ guests }: Props) {
                   </button>
                   <button
                     type="submit"
-                    disabled={submitting}
+                    disabled={submitting || emailError}
                     className="rounded-xl bg-topbar px-6 py-2.5 text-sm font-semibold text-text-on-dark transition hover:opacity-75 disabled:opacity-50"
                   >
                     {submitting ? "Saving..." : editGuest ? "Save Changes" : "Add Guest"}

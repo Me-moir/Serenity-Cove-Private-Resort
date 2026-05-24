@@ -55,7 +55,7 @@ export default async function ReportsSubtab3Page() {
                 {topGuests.map((guest, i) => (
                   <tr key={guest.guest_id} className="border-b border-border/50">
                     <td className="py-3 pr-4 text-text-muted">{i + 1}</td>
-                    <td className="py-3 pr-4 font-medium">{guest.guest_name}</td>
+                    <td className="py-3 pr-4 font-medium">{guest.first_name} {guest.last_name}</td>
                     <td className="py-3 pr-4 text-text-muted">{guest.guest_type}</td>
                     <td className="py-3 pr-4 text-right tabular-nums font-semibold">{guest.total_bookings}</td>
                     <td className="py-3 text-text-muted">{guest.last_stay ?? "—"}</td>
