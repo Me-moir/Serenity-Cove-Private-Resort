@@ -1,115 +1,93 @@
 import { Dot, Fire } from "react-bootstrap-icons";
-import type { ReportItem } from "@/types";
+import { getIntelligenceSnapshotForDate } from "@/lib/intelligence";
+import type { AccentColor } from "@/types";
 
-const reports: ReportItem[] = [
-  {
-    category: "Weather",
-    title: "Partly Sunny, Excessive Heat Reported",
-    detail: "Stay hydrated and monitor outdoor areas.",
-    accent: "orange",
-    icon: <Fire size={16} />
-  },
-  {
-    category: "AI Insight",
-    title: "Operational Signals",
-    detail: "Peak arrival window expected from 3PM to 5PM.",
-    accent: "blue"
-  },
-  {
-    category: "Guests",
-    title: "49 Reservations Expected",
-    detail: "Higher than usual ↗",
-    accent: "orange"
-  },
-  {
-    category: "Guests",
-    title: "2 VIP Guests Confirmed",
-    detail: "High profile guests expected to arrive at 4PM",
-    accent: "blue"
-  },
-  {
-    category: "Staff Task",
-    title: "13 Pending Maintenance",
-    detail: "View Staff Task Checklist",
-    accent: "orange"
-  },
-  {
-    category: "Reservations",
-    title: "98 New Pending Reservations",
-    detail: "Higher than usual ↗",
-    accent: "orange"
-  }
-];
+interface IntelligenecePanelProps {
+  selectedDate: string;
+}
 
-export default function ReportsPanel() {
-  const accentMap: Record<string, string> = {
-    orange: "text-accent-orange",
-    blue: "text-accent-blue",
-    red: "text-accent-red",
-    green: "text-accent-green"
-  };
+const accentMap: Record<AccentColor, string> = {
+  orange: "text-accent-orange",
+  blue: "text-accent-blue",
+  red: "text-accent-red",
+  green: "text-accent-green"
+};
+
+const chipMap: Record<AccentColor, string> = {
+  orange: "bg-accent-orange/15 text-accent-orange",
+  blue: "bg-accent-blue/15 text-accent-blue",
+  red: "bg-accent-red/15 text-accent-red",
+  green: "bg-accent-green/15 text-accent-green"
+};
+
+export default function IntelligenecePanel({ selectedDate }: IntelligenecePanelProps) {
+  const snapshot = getIntelligenceSnapshotForDate(selectedDate);
 
   return (
-    <div className="rounded-3xl bg-card-dark p-4 text-text-on-dark sm:p-6">
-      <div className="flex items-center justify-between">
-        <div className="text-base font-semibold tracking-[0.2em] sm:text-lg sm:tracking-[0.3em]">
-          REPORTS
-        </div>
-        <div className="text-[11px] text-text-on-dark/70 sm:text-xs">MAY 26, 2026</div>
+    <div className="rounded-3xl border border-white/10 bg-card-dark p-4 text-text-on-dark shadow-[0_24px_60px_rgba(0,0,0,0.28)] sm:p-6">
+      <div>
+        <div className="text-lg font-semibold sm:text-xl">Intelligence</div>
       </div>
 
-      <div className="mt-4 space-y-4">
-        {reports.map((report, index) => (
+      <div className="mt-4 inline-flex rounded-full border border-accent-blue/30 bg-accent-blue/10 px-3 py-1 text-[10px] uppercase tracking-[0.18em] text-accent-blue sm:text-[11px]">
+        {snapshot.label}
+      </div>
+
+      <div className="mt-5 space-y-3">
+        {snapshot.reports.map((report, index) => (
           <div
             key={`${report.category}-${index}`}
-            className="rounded-2xl bg-white/5 p-3 sm:p-4"
+            className="rounded-2xl border border-white/5 bg-white/5 p-3 shadow-[inset_0_1px_0_rgba(255,255,255,0.08)] transition hover:border-white/20 sm:p-4"
           >
-            <div className="flex items-center gap-2 text-[11px] uppercase tracking-[0.2em] text-text-on-dark/70 sm:text-xs sm:tracking-[0.3em]">
-              {report.icon ? (
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-2 text-[10px] uppercase text-text-on-dark/60 sm:text-[11px]">
+                {report.icon === "fire" ? (
+                  <span className={report.accent ? accentMap[report.accent] : ""}>
+                    <Fire size={15} />
+                  </span>
+                ) : null}
                 <span className={report.accent ? accentMap[report.accent] : ""}>
-                  {report.icon}
+                  {report.category}
                 </span>
-              ) : null}
-              <span className={report.accent ? accentMap[report.accent] : ""}>
-                {report.category}
+              </div>
+              <span
+                className={`rounded-full px-2 py-1 text-[9px] uppercase ${
+                  report.accent ? chipMap[report.accent] : "bg-white/10 text-text-on-dark/70"
+                }`}
+              >
+                {report.badge ?? "Live"}
               </span>
             </div>
-            <div className="mt-2 text-sm font-semibold sm:text-base">{report.title}</div>
+            <div className="mt-3 text-sm font-semibold sm:text-base">{report.title}</div>
 
-            {report.category === "AI Insight" ? (
+            {report.bullets?.length ? (
               <ul className="mt-3 space-y-2 text-xs text-text-on-dark/70 sm:text-sm">
-                <li className="flex items-center gap-2">
-                  <Dot size={18} />
-                  Focus staffing between 3PM and 5PM.
-                </li>
-                <li className="flex items-center gap-2">
-                  <Dot size={18} />
-                  VIP arrivals likely to request lounge seating.
-                </li>
-                <li className="flex items-center gap-2">
-                  <Dot size={18} />
-                  Maintenance queue should be cleared before 2PM.
-                </li>
+                {report.bullets.map((bullet, bulletIndex) => (
+                  <li key={`${report.category}-${bulletIndex}`} className="flex items-center gap-2">
+                    <Dot size={18} />
+                    <span>{bullet}</span>
+                  </li>
+                ))}
               </ul>
+            ) : null}
+
+            {report.linkHref && report.linkLabel ? (
+              <a
+                href={report.linkHref}
+                className={`mt-2 inline-flex text-xs sm:text-sm ${
+                  report.accent ? accentMap[report.accent] : "text-text-on-dark/70"
+                }`}
+              >
+                {report.linkLabel}
+              </a>
             ) : report.detail ? (
-              report.category === "Staff Task" ? (
-                <a
-                  href="/dashboard/staff-task"
-                  className="mt-2 inline-flex text-xs text-accent-orange sm:text-sm"
-                >
-                  {report.detail}
-                </a>
-              ) : (
-                <div
-                  className={`mt-2 text-xs sm:text-sm ${
-                    report.accent === "orange"
-                      ? "text-accent-orange"
-                      : "text-text-on-dark/70"
-                  }`}
-                >
-                  {report.detail}
-                </div>
-              )
+              <div
+                className={`mt-2 text-xs sm:text-sm ${
+                  report.accent ? accentMap[report.accent] : "text-text-on-dark/70"
+                }`}
+              >
+                {report.detail}
+              </div>
             ) : null}
           </div>
         ))}

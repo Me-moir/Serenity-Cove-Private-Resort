@@ -1,0 +1,435 @@
+{
+  "defaultScenarios": [
+    {
+      "id": "high-arrivals",
+      "label": "High Arrivals Window",
+      "reports": [
+        {
+          "category": "Weather",
+          "title": "Partly Sunny, Excessive Heat Reported",
+          "detail": "Keep hydration stations stocked and monitor outdoor zones.",
+          "accent": "orange",
+          "icon": "fire",
+          "badge": "Watch"
+        },
+        {
+          "category": "AI Insight",
+          "title": "Operational Signals",
+          "accent": "blue",
+          "bullets": [
+            "Peak arrival window expected from 3PM to 5PM.",
+            "Front desk response time may slow during 4PM check-ins.",
+            "Assign one floating staff member near lobby."
+          ]
+        },
+        {
+          "category": "Guests",
+          "title": "52 Reservations Expected",
+          "detail": "Higher than usual occupancy trend.",
+          "accent": "orange"
+        },
+        {
+          "category": "Staff Task",
+          "title": "11 Pending Maintenance",
+          "accent": "orange",
+          "linkLabel": "View Staff Task Checklist",
+          "linkHref": "/dashboard/staff-task"
+        },
+        {
+          "category": "Reservations",
+          "title": "84 New Pending Reservations",
+          "detail": "Review payment confirmations before 2PM.",
+          "accent": "orange"
+        }
+      ]
+    },
+    {
+      "id": "steady-day",
+      "label": "Balanced Operations",
+      "reports": [
+        {
+          "category": "Weather",
+          "title": "Clear Skies, Moderate Heat",
+          "detail": "Normal operations advised for all outdoor activity.",
+          "accent": "green",
+          "badge": "Stable"
+        },
+        {
+          "category": "AI Insight",
+          "title": "Service Quality Trend",
+          "accent": "blue",
+          "bullets": [
+            "Most requests are routine check-in concerns.",
+            "Housekeeping turnaround remains on target.",
+            "Guest wait times should remain under 6 minutes."
+          ]
+        },
+        {
+          "category": "Guests",
+          "title": "39 Reservations Expected",
+          "detail": "Close to baseline daily volume.",
+          "accent": "green"
+        },
+        {
+          "category": "Staff Task",
+          "title": "6 Pending Maintenance",
+          "accent": "blue",
+          "linkLabel": "Open Staff Task Board",
+          "linkHref": "/dashboard/staff-task"
+        },
+        {
+          "category": "Reservations",
+          "title": "41 New Pending Reservations",
+          "detail": "No unusual booking spikes detected.",
+          "accent": "blue"
+        }
+      ]
+    },
+    {
+      "id": "storm-watch",
+      "label": "Rain & Delay Advisory",
+      "reports": [
+        {
+          "category": "Weather",
+          "title": "Thunderstorm Advisory Issued",
+          "detail": "Prepare covered queue lanes for drop-off traffic.",
+          "accent": "red",
+          "icon": "fire",
+          "badge": "Urgent"
+        },
+        {
+          "category": "AI Insight",
+          "title": "Arrival Pattern Shift",
+          "accent": "blue",
+          "bullets": [
+            "Guests likely to cluster around late afternoon arrivals.",
+            "Expect 15-20% increase in lobby umbrella requests.",
+            "Coordinate with valet for weather-related delays."
+          ]
+        },
+        {
+          "category": "Guests",
+          "title": "44 Reservations Expected",
+          "detail": "Potential delay on evening check-ins.",
+          "accent": "red"
+        },
+        {
+          "category": "Staff Task",
+          "title": "14 Pending Maintenance",
+          "accent": "orange",
+          "linkLabel": "Review Priority Work Orders",
+          "linkHref": "/dashboard/staff-task"
+        },
+        {
+          "category": "Reservations",
+          "title": "57 New Pending Reservations",
+          "detail": "Confirm travel updates with incoming guests.",
+          "accent": "orange"
+        }
+      ]
+    },
+    {
+      "id": "event-day",
+      "label": "Event Traffic Day",
+      "reports": [
+        {
+          "category": "Weather",
+          "title": "Warm Conditions, No Alerts",
+          "detail": "Prepare shaded queue areas for expected crowd movement.",
+          "accent": "orange",
+          "badge": "Live"
+        },
+        {
+          "category": "AI Insight",
+          "title": "Event Load Forecast",
+          "accent": "blue",
+          "bullets": [
+            "Ballroom event check-in starts at 1PM.",
+            "Parking occupancy may exceed 85% by 2PM.",
+            "Promote digital check-in to reduce queue length."
+          ]
+        },
+        {
+          "category": "Guests",
+          "title": "61 Reservations Expected",
+          "detail": "Large group arrivals are scheduled in two waves.",
+          "accent": "orange"
+        },
+        {
+          "category": "Staff Task",
+          "title": "9 Pending Maintenance",
+          "accent": "blue",
+          "linkLabel": "Coordinate Event Support Tasks",
+          "linkHref": "/dashboard/staff-task"
+        },
+        {
+          "category": "Reservations",
+          "title": "93 New Pending Reservations",
+          "detail": "Elevated booking activity tied to conference events.",
+          "accent": "orange"
+        }
+      ]
+    },
+    {
+      "id": "maintenance-focus",
+      "label": "Maintenance Focus Day",
+      "reports": [
+        {
+          "category": "Weather",
+          "title": "Cloudy Skies, Comfortable Temperature",
+          "detail": "Good conditions for non-urgent facility checks.",
+          "accent": "green",
+          "badge": "Stable"
+        },
+        {
+          "category": "AI Insight",
+          "title": "Facility Health Notes",
+          "accent": "blue",
+          "bullets": [
+            "Maintenance backlog is concentrated in two room clusters.",
+            "HVAC tickets trend lower after noon.",
+            "Dispatch two technicians to clear legacy issues."
+          ]
+        },
+        {
+          "category": "Guests",
+          "title": "33 Reservations Expected",
+          "detail": "Lower traffic gives more room for preventive checks.",
+          "accent": "green"
+        },
+        {
+          "category": "Staff Task",
+          "title": "18 Pending Maintenance",
+          "accent": "red",
+          "linkLabel": "Open Maintenance Queue",
+          "linkHref": "/dashboard/staff-task"
+        },
+        {
+          "category": "Reservations",
+          "title": "36 New Pending Reservations",
+          "detail": "Monitor for last-minute evening bookings.",
+          "accent": "blue"
+        }
+      ]
+    },
+    {
+      "id": "vip-operations",
+      "label": "VIP Movement Day",
+      "reports": [
+        {
+          "category": "Weather",
+          "title": "Sunny with High Humidity",
+          "detail": "Deploy cool-down setup near entrance and lobby.",
+          "accent": "orange",
+          "icon": "fire",
+          "badge": "Watch"
+        },
+        {
+          "category": "AI Insight",
+          "title": "VIP Readiness Summary",
+          "accent": "blue",
+          "bullets": [
+            "Two high-profile arrivals estimated at 4PM.",
+            "Lounge seating should be reserved by 3:30PM.",
+            "Security sweep is recommended before noon."
+          ]
+        },
+        {
+          "category": "Guests",
+          "title": "47 Reservations Expected",
+          "detail": "VIP timing overlaps with standard check-in wave.",
+          "accent": "blue"
+        },
+        {
+          "category": "Staff Task",
+          "title": "7 Pending Maintenance",
+          "accent": "green",
+          "linkLabel": "Confirm VIP Support Readiness",
+          "linkHref": "/dashboard/staff-task"
+        },
+        {
+          "category": "Reservations",
+          "title": "68 New Pending Reservations",
+          "detail": "Escalate premium room approvals before 1PM.",
+          "accent": "orange"
+        }
+      ]
+    }
+  ],
+  "dateOverrides": [
+    {
+      "date": "2026-05-24",
+      "id": "override-lobby-pressure",
+      "label": "Lobby Pressure Alert",
+      "reports": [
+        {
+          "category": "Weather",
+          "title": "Heat Index Spiking by Midday",
+          "detail": "Activate cooling fans and drinking water points in public areas.",
+          "accent": "orange",
+          "icon": "fire",
+          "badge": "Watch"
+        },
+        {
+          "category": "AI Insight",
+          "title": "Crowd Density Projection",
+          "accent": "blue",
+          "bullets": [
+            "Lobby density may peak around 4:15PM.",
+            "Queue overflow risk is moderate at check-in counters.",
+            "Route one staff member to guest triage near reception."
+          ]
+        },
+        {
+          "category": "Guests",
+          "title": "55 Reservations Expected",
+          "detail": "Late afternoon arrivals are above normal.",
+          "accent": "orange"
+        },
+        {
+          "category": "Staff Task",
+          "title": "12 Pending Maintenance",
+          "accent": "orange",
+          "linkLabel": "Prioritize Guest-Facing Repairs",
+          "linkHref": "/dashboard/staff-task"
+        },
+        {
+          "category": "Reservations",
+          "title": "90 New Pending Reservations",
+          "detail": "Potential overbooking pressure in standard rooms.",
+          "accent": "red"
+        }
+      ]
+    },
+    {
+      "date": "2026-05-26",
+      "id": "override-vip-briefing",
+      "label": "VIP Coordination Brief",
+      "reports": [
+        {
+          "category": "Weather",
+          "title": "Partly Sunny, Warm Afternoon",
+          "detail": "No disruption risk, but hydration reminders stay active.",
+          "accent": "green",
+          "badge": "Live"
+        },
+        {
+          "category": "AI Insight",
+          "title": "VIP Transit Watch",
+          "accent": "blue",
+          "bullets": [
+            "VIP convoy ETA currently between 3:45PM and 4:10PM.",
+            "Prepare lounge handoff checklist before 3:30PM.",
+            "Coordinate with security for discrete escort route."
+          ]
+        },
+        {
+          "category": "Guests",
+          "title": "49 Reservations Expected",
+          "detail": "Higher than usual with premium-tier concentration.",
+          "accent": "blue"
+        },
+        {
+          "category": "Staff Task",
+          "title": "8 Pending Maintenance",
+          "accent": "green",
+          "linkLabel": "Open VIP Prep Tasks",
+          "linkHref": "/dashboard/staff-task"
+        },
+        {
+          "category": "Reservations",
+          "title": "98 New Pending Reservations",
+          "detail": "High booking momentum continues through evening.",
+          "accent": "orange"
+        }
+      ]
+    },
+    {
+      "date": "2026-05-29",
+      "id": "override-thunderstorm-response",
+      "label": "Storm Response Snapshot",
+      "reports": [
+        {
+          "category": "Weather",
+          "title": "Heavy Rainfall Warning",
+          "detail": "Reinforce covered guest drop-off and keep umbrellas staged.",
+          "accent": "red",
+          "icon": "fire",
+          "badge": "Urgent"
+        },
+        {
+          "category": "AI Insight",
+          "title": "Delay Mitigation Focus",
+          "accent": "blue",
+          "bullets": [
+            "Average arrival delays projected at 18 minutes.",
+            "Guest support desk likely to receive weather-related requests.",
+            "Shift one concierge agent to transport coordination."
+          ]
+        },
+        {
+          "category": "Guests",
+          "title": "42 Reservations Expected",
+          "detail": "Monitor cancellation and reschedule traffic closely.",
+          "accent": "red"
+        },
+        {
+          "category": "Staff Task",
+          "title": "15 Pending Maintenance",
+          "accent": "orange",
+          "linkLabel": "Escalate Safety-Critical Tickets",
+          "linkHref": "/dashboard/staff-task"
+        },
+        {
+          "category": "Reservations",
+          "title": "63 New Pending Reservations",
+          "detail": "Flexible rebooking requests are increasing.",
+          "accent": "orange"
+        }
+      ]
+    },
+    {
+      "date": "2026-06-01",
+      "id": "override-monthly-kickoff",
+      "label": "Month Kickoff Forecast",
+      "reports": [
+        {
+          "category": "Weather",
+          "title": "Bright Morning, Warm Afternoon",
+          "detail": "Normal operations expected across all zones.",
+          "accent": "green",
+          "badge": "Stable"
+        },
+        {
+          "category": "AI Insight",
+          "title": "Monthly Demand Trend",
+          "accent": "blue",
+          "bullets": [
+            "Demand expected to climb gradually across the week.",
+            "Early-week arrivals skew toward business travelers.",
+            "Promote fast-lane check-in for repeat guests."
+          ]
+        },
+        {
+          "category": "Guests",
+          "title": "37 Reservations Expected",
+          "detail": "Strong start with steady weekday bookings.",
+          "accent": "blue"
+        },
+        {
+          "category": "Staff Task",
+          "title": "5 Pending Maintenance",
+          "accent": "green",
+          "linkLabel": "Review Weekly Preventive Plan",
+          "linkHref": "/dashboard/staff-task"
+        },
+        {
+          "category": "Reservations",
+          "title": "46 New Pending Reservations",
+          "detail": "Early confirmations are arriving ahead of schedule.",
+          "accent": "blue"
+        }
+      ]
+    }
+  ]
+}
