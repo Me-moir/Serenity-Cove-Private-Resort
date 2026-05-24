@@ -12,11 +12,11 @@ export default function CalendarPage() {
       </div>
 
       <div className="lg:hidden">
-        <details className="rounded-3xl bg-card-dark p-5 text-text-on-dark">
-          <summary className="cursor-pointer text-sm font-semibold tracking-[0.3em] text-text-on-dark">
+        <details className="overflow-hidden rounded-3xl border border-white/10 bg-card-dark text-text-on-dark">
+          <summary className="cursor-pointer px-5 py-4 text-sm font-semibold tracking-[0.2em] text-text-on-dark">
             REPORTS
           </summary>
-          <div className="mt-4">
+          <div className="px-2 pb-2">
             <ReportsPanel />
           </div>
         </details>

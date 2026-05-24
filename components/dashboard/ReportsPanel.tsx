@@ -50,16 +50,21 @@ export default function ReportsPanel() {
   };
 
   return (
-    <div className="rounded-3xl bg-card-dark p-6 text-text-on-dark">
+    <div className="rounded-3xl bg-card-dark p-4 text-text-on-dark sm:p-6">
       <div className="flex items-center justify-between">
-        <div className="text-lg font-semibold tracking-[0.3em]">REPORTS</div>
-        <div className="text-xs text-text-on-dark/70">MAY 26, 2026</div>
+        <div className="text-base font-semibold tracking-[0.2em] sm:text-lg sm:tracking-[0.3em]">
+          REPORTS
+        </div>
+        <div className="text-[11px] text-text-on-dark/70 sm:text-xs">MAY 26, 2026</div>
       </div>
 
       <div className="mt-4 space-y-4">
         {reports.map((report, index) => (
-          <div key={`${report.category}-${index}`} className="rounded-2xl bg-white/5 p-4">
-            <div className="flex items-center gap-2 text-xs uppercase tracking-[0.3em] text-text-on-dark/70">
+          <div
+            key={`${report.category}-${index}`}
+            className="rounded-2xl bg-white/5 p-3 sm:p-4"
+          >
+            <div className="flex items-center gap-2 text-[11px] uppercase tracking-[0.2em] text-text-on-dark/70 sm:text-xs sm:tracking-[0.3em]">
               {report.icon ? (
                 <span className={report.accent ? accentMap[report.accent] : ""}>
                   {report.icon}
@@ -69,10 +74,10 @@ export default function ReportsPanel() {
                 {report.category}
               </span>
             </div>
-            <div className="mt-2 text-base font-semibold">{report.title}</div>
+            <div className="mt-2 text-sm font-semibold sm:text-base">{report.title}</div>
 
             {report.category === "AI Insight" ? (
-              <ul className="mt-3 space-y-2 text-sm text-text-on-dark/70">
+              <ul className="mt-3 space-y-2 text-xs text-text-on-dark/70 sm:text-sm">
                 <li className="flex items-center gap-2">
                   <Dot size={18} />
                   Focus staffing between 3PM and 5PM.
@@ -90,13 +95,13 @@ export default function ReportsPanel() {
               report.category === "Staff Task" ? (
                 <a
                   href="/dashboard/staff-task"
-                  className="mt-2 inline-flex text-sm text-accent-orange"
+                  className="mt-2 inline-flex text-xs text-accent-orange sm:text-sm"
                 >
                   {report.detail}
                 </a>
               ) : (
                 <div
-                  className={`mt-2 text-sm ${
+                  className={`mt-2 text-xs sm:text-sm ${
                     report.accent === "orange"
                       ? "text-accent-orange"
                       : "text-text-on-dark/70"

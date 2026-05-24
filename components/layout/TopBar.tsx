@@ -9,7 +9,7 @@ interface TopBarProps {
 
 export default function TopBar({ onMenuClick }: TopBarProps) {
   const time = useClock();
-  const displayDate = new Date(2026, 4, 26);
+  const displayDate = time;
   const dayName = displayDate.toLocaleDateString("en-US", { weekday: "long" });
   const dateLabel = displayDate.toLocaleDateString("en-GB", {
     day: "2-digit",
@@ -23,8 +23,8 @@ export default function TopBar({ onMenuClick }: TopBarProps) {
 
   return (
     <header className="w-full bg-topbar text-text-on-dark">
-      <div className="flex items-center justify-between px-4 py-4 sm:px-6 lg:px-8">
-        <div className="flex items-center gap-4 md:hidden">
+      <div className="flex items-center justify-between px-3 py-3 sm:px-6 lg:px-8">
+        <div className="flex min-w-[2.75rem] items-center md:hidden">
           <button
             type="button"
             onClick={onMenuClick}
@@ -35,14 +35,15 @@ export default function TopBar({ onMenuClick }: TopBarProps) {
           </button>
         </div>
 
-        <div className="flex flex-1 items-center justify-center md:hidden">
+        <div className="flex flex-1 items-center justify-center px-2 text-center md:hidden">
           <div className="text-center">
             <div className="text-sm font-semibold">{dayName}</div>
-            <div className="text-xs text-text-on-dark/70">{dateLabel}</div>
+            <div className="text-[11px] text-text-on-dark/70">{dateLabel}</div>
+            <div className="text-[11px] text-text-on-dark/60">{timeLabel}</div>
           </div>
         </div>
 
-        <div className="flex items-center md:hidden">
+        <div className="flex min-w-[2.75rem] items-center justify-end md:hidden">
           <button type="button" className="rounded-full p-2" aria-label="Alerts">
             <Bell size={18} />
           </button>

@@ -17,6 +17,27 @@
   --color-accent-green: #38A169;
   --color-accent-blue: #3182CE;
   --color-border: #E5E5E5;
+  --color-surface-soft: rgba(255, 255, 255, 0.72);
+  --color-surface-soft-hover: #FFFFFF;
+}
+
+[data-theme="dark"] {
+  --color-shell: #121212;
+  --color-sidebar: #191919;
+  --color-rail: #101010;
+  --color-topbar: #0F0F0F;
+  --color-card-dark: #141414;
+  --color-card-light: #1D1D1D;
+  --color-text-on-dark: #FFFFFF;
+  --color-text-on-light: #FFFFFF;
+  --color-text-muted: #C7C7C7;
+  --color-accent-orange: #FB923C;
+  --color-accent-red: #F87171;
+  --color-accent-green: #4ADE80;
+  --color-accent-blue: #60A5FA;
+  --color-border: #313131;
+  --color-surface-soft: rgba(255, 255, 255, 0.06);
+  --color-surface-soft-hover: #2A2A2A;
 }
 
 * {
@@ -32,4 +53,5 @@ body {
   background: var(--color-shell);
   color: var(--color-text-on-light);
   font-family: var(--font-geist-sans), "SF Pro Display", system-ui, sans-serif;
+  transition: background-color 220ms ease, color 220ms ease;
 }

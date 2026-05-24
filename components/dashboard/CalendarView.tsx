@@ -33,9 +33,9 @@ export default function CalendarView() {
   }
 
   return (
-    <div className="rounded-3xl bg-card-dark p-6 text-text-on-dark">
+    <div className="rounded-3xl bg-card-dark p-4 text-text-on-dark sm:p-6">
       <div className="flex items-center justify-between">
-        <div className="text-xs uppercase tracking-[0.4em] text-text-on-dark/70">
+        <div className="text-[11px] uppercase tracking-[0.25em] text-text-on-dark/70 sm:text-xs sm:tracking-[0.4em]">
           {monthLabels[monthIndex]}
         </div>
         <div className="flex items-center gap-2">
@@ -58,7 +58,7 @@ export default function CalendarView() {
         </div>
       </div>
 
-      <div className="mt-6 grid grid-cols-7 gap-2 text-[11px] text-text-on-dark/70">
+      <div className="mt-6 grid grid-cols-7 gap-1.5 text-[10px] text-text-on-dark/70 sm:gap-2 sm:text-[11px]">
         {weekDays.map((day) => (
           <div key={day} className="text-center">
             {day}
@@ -66,26 +66,26 @@ export default function CalendarView() {
         ))}
       </div>
 
-      <div className="mt-4 grid grid-cols-7 gap-2">
+      <div className="mt-4 grid grid-cols-7 gap-1.5 sm:gap-2">
         {cells.map((cell, index) => (
           <div key={`${cell.day ?? "empty"}-${index}`}>
             {cell.day ? (
               <div
-                className={`flex h-12 flex-col items-center justify-center rounded-2xl text-sm sm:h-14 ${
+                className={`flex h-10 flex-col items-center justify-center rounded-2xl text-xs sm:h-14 sm:text-sm ${
                   cell.isToday
-                    ? "bg-white text-text-on-light"
+                    ? "bg-topbar text-text-on-dark"
                     : "bg-white/5 text-text-on-dark"
                 }`}
               >
                 <div className="font-semibold">{cell.day}</div>
                 {cell.isToday ? (
-                  <div className="mt-1 text-[10px] font-semibold uppercase tracking-[0.2em] text-text-on-light">
+                  <div className="mt-1 hidden text-[10px] font-semibold uppercase tracking-[0.2em] text-text-on-light sm:block">
                     Today
                   </div>
                 ) : null}
               </div>
             ) : (
-              <div className="h-12 sm:h-14" />
+              <div className="h-10 sm:h-14" />
             )}
 
             {cell.day && cell.dots && cell.dots.length > 0 ? (
@@ -102,7 +102,7 @@ export default function CalendarView() {
         ))}
       </div>
 
-      <div className="mt-6 flex flex-wrap gap-4 text-xs text-text-on-dark/70">
+      <div className="mt-6 grid gap-2 text-[11px] text-text-on-dark/70 sm:flex sm:flex-wrap sm:gap-4 sm:text-xs">
         <LegendDot color="orange" label="Flags Reported" />
         <LegendDot color="red" label="Unresolved Incidence" />
         <LegendDot color="green" label="Need Attention" />

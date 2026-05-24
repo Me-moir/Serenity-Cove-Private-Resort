@@ -18,7 +18,9 @@ const config: Config = {
         "accent-red": "var(--color-accent-red)",
         "accent-green": "var(--color-accent-green)",
         "accent-blue": "var(--color-accent-blue)",
-        border: "var(--color-border)"
+        border: "var(--color-border)",
+        "surface-soft": "var(--color-surface-soft)",
+        "surface-soft-hover": "var(--color-surface-soft-hover)"
       },
       fontFamily: {
         sans: [

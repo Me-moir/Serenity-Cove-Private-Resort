@@ -59,7 +59,7 @@ export default function LoginPage() {
             required
             value={email}
             onChange={(event) => setEmail(event.target.value)}
-            className="w-full rounded-2xl border border-border bg-white px-4 py-3 text-sm"
+            className="w-full rounded-2xl border border-border bg-card-light px-4 py-3 text-sm"
             aria-label="Email address"
           />
 
@@ -74,7 +74,7 @@ export default function LoginPage() {
             required
             value={password}
             onChange={(event) => setPassword(event.target.value)}
-            className="w-full rounded-2xl border border-border bg-white px-4 py-3 text-sm"
+            className="w-full rounded-2xl border border-border bg-card-light px-4 py-3 text-sm"
             aria-label="Password"
           />
 

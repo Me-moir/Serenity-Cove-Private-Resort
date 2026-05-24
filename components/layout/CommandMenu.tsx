@@ -15,11 +15,11 @@ export default function CommandMenu() {
     >
       <span className="flex items-center gap-2">
         <Search size={14} />
-        <span className="hidden md:group-hover:inline lg:inline text-text-on-dark/70">
+        <span className="text-text-on-dark/70">
           Find
         </span>
       </span>
-      <kbd className="hidden md:group-hover:inline-flex lg:inline-flex rounded-full border border-white/30 px-2 py-0.5 text-[10px] tracking-[0.2em]">
+      <kbd className="hidden rounded-full border border-white/30 px-2 py-0.5 text-[10px] tracking-[0.2em] sm:inline-flex">
         ⌘K
       </kbd>
     </button>

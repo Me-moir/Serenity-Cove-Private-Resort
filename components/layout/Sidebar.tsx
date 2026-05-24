@@ -65,6 +65,30 @@ const reportsNavItems: SidebarNavItem[] = [
   { label: "Subtab 3", href: "/dashboard/reports/subtab-3", icon: Clipboard }
 ];
 
+const flagsNavItems: SidebarNavItem[] = [
+  { label: "System Flags", href: "/dashboard/flags/subtab-1", icon: Clipboard },
+  { label: "Crash & Downtime", href: "/dashboard/flags/subtab-2", icon: Clipboard },
+  { label: "Traffic Monitor", href: "/dashboard/flags/subtab-3", icon: Clipboard }
+];
+
+const changelogNavItems: SidebarNavItem[] = [
+  { label: "Recent Updates", href: "/dashboard/changelog/subtab-1", icon: Clipboard },
+  { label: "Patches", href: "/dashboard/changelog/subtab-2", icon: Clipboard },
+  { label: "Revamps", href: "/dashboard/changelog/subtab-3", icon: Clipboard }
+];
+
+const profileNavItems: SidebarNavItem[] = [
+  { label: "Account Overview", href: "/dashboard/profile/subtab-1", icon: Clipboard },
+  { label: "Access & Roles", href: "/dashboard/profile/subtab-2", icon: Clipboard },
+  { label: "Activity Logs", href: "/dashboard/profile/subtab-3", icon: Clipboard }
+];
+
+const settingsNavItems: SidebarNavItem[] = [
+  { label: "Appearance", href: "/dashboard/settings/subtab-1", icon: Clipboard },
+  { label: "Notifications", href: "/dashboard/settings/subtab-2", icon: Clipboard },
+  { label: "Preferences", href: "/dashboard/settings/subtab-3", icon: Clipboard }
+];
+
 export default function Sidebar({
   isMobileOpen,
   onClose,
@@ -85,14 +109,17 @@ export default function Sidebar({
   const SIDEBAR_EASING = "cubic-bezier(0.22, 1, 0.36, 1)";
   const INNER_SIDEBAR_WIDTH = SIDEBAR_WIDTH - OUTER_SIDEBAR_PADDING * 2;
   const activeBarLeftOffset = -NAV_HORIZONTAL_PADDING;
-  const navItems =
-    activeMainTab === "HomeDashboard"
-      ? homeNavItems
-      : activeMainTab === "RecordsManagement"
-      ? recordsNavItems
-      : activeMainTab === "CleaningSchedule"
-      ? cleaningNavItems
-      : reportsNavItems;
+  const navItemsByMainTab: Record<string, SidebarNavItem[]> = {
+    HomeDashboard: homeNavItems,
+    RecordsManagement: recordsNavItems,
+    CleaningSchedule: cleaningNavItems,
+    ReportsAnalytics: reportsNavItems,
+    FlagsMonitoring: flagsNavItems,
+    ChangelogHistory: changelogNavItems,
+    AdminProfile: profileNavItems,
+    DashboardSettings: settingsNavItems
+  };
+  const navItems = navItemsByMainTab[activeMainTab] ?? homeNavItems;
   const activePath = optimisticHref ?? pathname;
   const activeIndex = navItems.findIndex((item) => item.href === activePath);
   const activeBarWidth = INNER_SIDEBAR_WIDTH;
@@ -100,7 +127,11 @@ export default function Sidebar({
     HomeDashboard: { label: "Home", title: "Dashboard" },
     RecordsManagement: { label: "Records", title: "Management" },
     CleaningSchedule: { label: "Cleaning", title: "Schedule" },
-    ReportsAnalytics: { label: "Reports", title: "Analytics" }
+    ReportsAnalytics: { label: "Reports", title: "Analytics" },
+    FlagsMonitoring: { label: "Flags", title: "Monitoring" },
+    ChangelogHistory: { label: "System", title: "Changelog" },
+    AdminProfile: { label: "Admin", title: "Profile" },
+    DashboardSettings: { label: "Dashboard", title: "Settings" }
   };
   const activeTitle = titleMap[activeMainTab] ?? titleMap.HomeDashboard;
 
@@ -164,6 +195,14 @@ export default function Sidebar({
     }
   }, [optimisticHref, pathname]);
 
+  useEffect(() => {
+    navItems.forEach((item) => {
+      if (item.href) {
+        router.prefetch(item.href);
+      }
+    });
+  }, [navItems, router]);
+
   const sidebarContent = (
     <div className="flex h-full flex-col">
       <div className="flex items-center justify-between px-4 pt-6">
@@ -173,14 +212,16 @@ export default function Sidebar({
           </div>
           <div className="text-lg font-semibold">{activeTitle.title}</div>
         </div>
-        <button
-          type="button"
-          className="rounded-full p-2 text-text-muted"
-          aria-label={isCollapsed ? "Expand sidebar" : "Collapse sidebar"}
-          onClick={onToggleCollapse}
-        >
-          <LayoutSidebar size={18} />
-        </button>
+        <div className="hidden md:block">
+          <button
+            type="button"
+            className="rounded-full p-2 text-text-muted"
+            aria-label={isCollapsed ? "Expand sidebar" : "Collapse sidebar"}
+            onClick={onToggleCollapse}
+          >
+            <LayoutSidebar size={18} />
+          </button>
+        </div>
       </div>
 
       <nav className="mt-6 flex-1 px-3">
@@ -206,11 +247,11 @@ export default function Sidebar({
               const content = (
                 <>
                   <Icon size={18} className="shrink-0" />
-                  <span className="hidden md:group-hover:inline lg:inline">
+                  <span className="inline">
                     {item.label}
                   </span>
                   {item.badge ? (
-                    <span className="ml-auto hidden lg:flex">
+                    <span className="ml-auto flex">
                       <Badge label={item.badge} />
                     </span>
                   ) : null}
@@ -231,6 +272,10 @@ export default function Sidebar({
                   onClick={() => {
                     if (item.href) {
                       setOptimisticHref(item.href);
+                    }
+
+                    if (isMobileOpen) {
+                      onClose();
                     }
                   }}
                 >
@@ -261,7 +306,7 @@ export default function Sidebar({
             aria-label="View manual"
           >
             <QuestionCircle size={16} />
-            <span className="hidden md:group-hover:inline lg:inline">
+            <span className="inline">
               View Manual
             </span>
           </button>
@@ -271,7 +316,7 @@ export default function Sidebar({
             aria-label="Contact admin"
           >
             <Telephone size={16} />
-            <span className="hidden md:group-hover:inline lg:inline">
+            <span className="inline">
               Contact Admin
             </span>
           </button>
@@ -318,10 +363,12 @@ export default function Sidebar({
           <div
             ref={panelRef}
             tabIndex={-1}
-            className="relative h-full w-full max-w-xs rounded-l-3xl bg-sidebar text-text-on-light shadow-xl"
+            className="relative h-full w-[min(22rem,88vw)] overflow-y-auto overflow-x-hidden rounded-r-3xl bg-sidebar text-text-on-light shadow-xl"
           >
-            <div className="flex items-center justify-between px-4 pt-4">
-              <div className="text-lg font-semibold">Home Dashboard</div>
+            <div className="flex items-center justify-between px-4 pt-4 md:hidden">
+              <div className="text-sm uppercase tracking-[0.3em] text-text-muted">
+                Navigation
+              </div>
               <button
                 type="button"
                 onClick={onClose}

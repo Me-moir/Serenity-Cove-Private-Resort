@@ -12,23 +12,44 @@ import {
   Gear,
   Grid1x2,
   House,
-  ListTask,
   Moon,
-  PersonCircle
+  PersonCircle,
+  Sun
 } from "react-bootstrap-icons";
+import { useTheme } from "@/components/theme/ThemeProvider";
 
 const topTabs = [
   { id: "HomeDashboard", href: "/dashboard/summary", icon: House, label: "Home" },
-  { id: "RecordsManagement", href: "/dashboard/records", icon: Grid1x2, label: "Records" },
-  { id: "CleaningSchedule", href: "/dashboard/cleaning", icon: CalendarCheck, label: "Cleaning" },
-  { id: "ReportsAnalytics", href: "/dashboard/reports", icon: BarChart, label: "Reports" }
+  {
+    id: "RecordsManagement",
+    href: "/dashboard/records/subtab-1",
+    icon: Grid1x2,
+    label: "Records"
+  },
+  {
+    id: "CleaningSchedule",
+    href: "/dashboard/cleaning/subtab-1",
+    icon: CalendarCheck,
+    label: "Cleaning"
+  },
+  {
+    id: "ReportsAnalytics",
+    href: "/dashboard/reports/subtab-1",
+    icon: BarChart,
+    label: "Reports"
+  }
 ];
 
-const bottomLinks = [
-  { href: "/dashboard/summary", icon: Flag, label: "Flags" },
-  { href: "/dashboard/summary", icon: ClockHistory, label: "Changelog" },
-  { href: "/dashboard/summary", icon: PersonCircle, label: "Profile" },
-  { href: "/dashboard/summary", icon: Gear, label: "Settings" }
+const bottomTabs = [
+  { id: "FlagsMonitoring", href: "/dashboard/flags/subtab-1", icon: Flag, label: "Flags" },
+  {
+    id: "ChangelogHistory",
+    href: "/dashboard/changelog/subtab-1",
+    icon: ClockHistory,
+    label: "Changelog"
+  },
+  { id: "AdminProfile", href: "/dashboard/profile/subtab-1", icon: PersonCircle, label: "Profile" },
+  { id: "DashboardSettings", href: "/dashboard/settings/subtab-1", icon: Gear, label: "Settings" }
 ];
 
 interface SidebarIconRailProps {
@@ -40,6 +61,7 @@ export default function SidebarIconRail({
   activeTab,
   onSelectTab
 }: SidebarIconRailProps) {
+  const { resolvedTheme, toggleTheme } = useTheme();
   const pathname = usePathname();
   const router = useRouter();
   const currentPathTab = pathname.startsWith("/dashboard/records")
@@ -48,12 +70,20 @@ export default function SidebarIconRail({
     ? "CleaningSchedule"
     : pathname.startsWith("/dashboard/reports")
     ? "ReportsAnalytics"
+    : pathname.startsWith("/dashboard/flags")
+    ? "FlagsMonitoring"
+    : pathname.startsWith("/dashboard/changelog")
+    ? "ChangelogHistory"
+    : pathname.startsWith("/dashboard/profile")
+    ? "AdminProfile"
+    : pathname.startsWith("/dashboard/settings")
+    ? "DashboardSettings"
     : "HomeDashboard";
   const activeIndex = topTabs.findIndex((tab) => tab.id === activeTab);
   const railStep = 44;
 
   useEffect(() => {
-    topTabs.forEach((tab) => {
+    [...topTabs, ...bottomTabs].forEach((tab) => {
       router.prefetch(tab.href);
     });
   }, [router]);
@@ -61,63 +91,81 @@ export default function SidebarIconRail({
   return (
     <aside className="sticky top-0 hidden h-dvh w-20 self-start overscroll-none bg-shell px-3 py-4 lg:flex lg:h-screen">
       <div className="flex h-full w-full flex-col justify-between rounded-3xl bg-rail px-2 py-4 shadow-sm">
-          <div className="flex flex-col items-center rounded-3xl bg-white/70 p-2 shadow-[0_10px_30px_rgba(0,0,0,0.08)]">
-            <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-topbar text-[9px] font-semibold uppercase tracking-[0.3em] text-text-on-dark">
-              HD
-            </div>
-            <div className="my-2 h-px w-9 bg-border" />
-            <div className="relative flex flex-col items-center gap-2">
-              {activeIndex >= 0 ? (
-                <span
-                  className="pointer-events-none absolute left-0 right-0 h-9 rounded-md bg-topbar transition-transform duration-200 ease-out"
-                  style={{
-                    transform: `translateY(${activeIndex * railStep}px)`
-                  }}
-                >
-                  <span className="absolute inset-y-1 -left-2 w-1 bg-[#22D3C5]" />
-                </span>
-              ) : null}
-              {topTabs.map((tab) => {
-                const Icon = tab.icon;
-                const isActive = activeTab === tab.id;
-                const shouldStayOnCurrentPath = currentPathTab === tab.id;
-                const destinationHref = shouldStayOnCurrentPath ? pathname : tab.href;
-                const handleTopTabClick = (event: MouseEvent<HTMLAnchorElement>) => {
-                  if (shouldStayOnCurrentPath) {
-                    event.preventDefault();
-                  }
-
-                  onSelectTab(tab.id);
-                };
-
-                return (
-                  <Link
-                    key={tab.label}
-                    href={destinationHref}
-                    prefetch
-                    onClick={handleTopTabClick}
-                    className={`relative z-10 flex h-9 w-9 items-center justify-center rounded-md border border-transparent ${
-                      isActive ? "text-text-on-dark" : "text-text-on-light"
-                    }`}
-                    aria-label={tab.label}
-                    aria-pressed={isActive}
-                  >
-                    <Icon size={18} />
-                  </Link>
-                );
-              })}
-            </div>
+        <div className="flex flex-col items-center rounded-3xl bg-surface-soft p-2 shadow-[0_10px_30px_rgba(0,0,0,0.08)]">
+          <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-topbar text-[9px] font-semibold uppercase tracking-[0.3em] text-text-on-dark">
+            HD
           </div>
+          <div className="my-2 h-px w-9 bg-border" />
+          <div className="relative flex flex-col items-center gap-2">
+            {activeIndex >= 0 ? (
+              <span
+                className="pointer-events-none absolute left-0 right-0 h-9 rounded-md bg-topbar transition-transform duration-200 ease-out"
+                style={{
+                  transform: `translateY(${activeIndex * railStep}px)`
+                }}
+              >
+                <span className="absolute inset-y-1 -left-2 w-1 bg-[#22D3C5]" />
+              </span>
+            ) : null}
+            {topTabs.map((tab) => {
+              const Icon = tab.icon;
+              const isActive = activeTab === tab.id;
+              const shouldStayOnCurrentPath = currentPathTab === tab.id;
+              const destinationHref = shouldStayOnCurrentPath ? pathname : tab.href;
+              const handleTopTabClick = (event: MouseEvent<HTMLAnchorElement>) => {
+                if (shouldStayOnCurrentPath) {
+                  event.preventDefault();
+                }
 
-        <div className="flex flex-col items-center gap-2 rounded-3xl bg-white/70 p-2 shadow-[0_10px_30px_rgba(0,0,0,0.08)]">
-          {bottomLinks.map((link) => {
-            const Icon = link.icon;
+                onSelectTab(tab.id);
+              };
+
+              return (
+                <Link
+                  key={tab.label}
+                  href={destinationHref}
+                  prefetch
+                  onClick={handleTopTabClick}
+                  className={`relative z-10 flex h-9 w-9 items-center justify-center rounded-md border border-transparent ${
+                    isActive ? "text-text-on-dark" : "text-text-on-light"
+                  }`}
+                  aria-label={tab.label}
+                  aria-pressed={isActive}
+                >
+                  <Icon size={18} />
+                </Link>
+              );
+            })}
+          </div>
+        </div>
+
+        <div className="flex flex-col items-center gap-2 rounded-3xl bg-surface-soft p-2 shadow-[0_10px_30px_rgba(0,0,0,0.08)]">
+          {bottomTabs.map((tab) => {
+            const Icon = tab.icon;
+            const isActive = activeTab === tab.id;
+            const shouldStayOnCurrentPath = currentPathTab === tab.id;
+            const destinationHref = shouldStayOnCurrentPath ? pathname : tab.href;
+            const handleBottomTabClick = (event: MouseEvent<HTMLAnchorElement>) => {
+              if (shouldStayOnCurrentPath) {
+                event.preventDefault();
+              }
+
+              onSelectTab(tab.id);
+            };
+
             return (
               <Link
-                key={link.label}
-                href={link.href}
-                className="flex h-9 w-9 items-center justify-center rounded-full border border-transparent text-text-on-light transition hover:bg-white"
-                aria-label={link.label}
+                key={tab.label}
+                href={destinationHref}
+                prefetch
+                onClick={handleBottomTabClick}
+                className={`flex h-9 w-9 items-center justify-center rounded-full border border-transparent transition ${
+                  isActive
+                    ? "bg-topbar text-text-on-dark"
+                    : "text-text-on-light hover:bg-surface-soft-hover"
+                }`}
+                aria-label={tab.label}
+                aria-pressed={isActive}
               >
                 <Icon size={18} />
               </Link>
@@ -125,10 +173,18 @@ export default function SidebarIconRail({
           })}
 
           <div className="mt-2 flex flex-col items-center gap-2 text-[10px] font-semibold uppercase tracking-[0.3em] text-text-muted">
-            <span>Switch</span>
-            <div className="flex h-8 w-8 items-center justify-center rounded-full bg-white text-text-on-light">
-              <Moon size={14} />
-            </div>
+            <button
+              type="button"
+              onClick={toggleTheme}
+              className="flex h-8 w-8 items-center justify-center rounded-full bg-surface-soft-hover text-text-on-light transition hover:scale-105"
+              aria-label={
+                resolvedTheme === "dark"
+                  ? "Switch to light mode"
+                  : "Switch to dark mode"
+              }
+            >
+              {resolvedTheme === "dark" ? <Sun size={14} /> : <Moon size={14} />}
+            </button>
           </div>
         </div>
       </div>
