@@ -1,0 +1,35 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --color-shell: #F0F0F0;
+  --color-sidebar: #FFFFFF;
+  --color-rail: #F5F5F5;
+  --color-topbar: #1A1A1A;
+  --color-card-dark: #1A1A1A;
+  --color-card-light: #FFFFFF;
+  --color-text-on-dark: #FFFFFF;
+  --color-text-on-light: #1A1A1A;
+  --color-text-muted: #6B6B6B;
+  --color-accent-orange: #F5A623;
+  --color-accent-red: #E53E3E;
+  --color-accent-green: #38A169;
+  --color-accent-blue: #3182CE;
+  --color-border: #E5E5E5;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  height: 100%;
+}
+
+body {
+  background: var(--color-shell);
+  color: var(--color-text-on-light);
+  font-family: var(--font-geist-sans), "SF Pro Display", system-ui, sans-serif;
+}
