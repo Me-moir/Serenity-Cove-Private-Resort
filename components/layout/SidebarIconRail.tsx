@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { useEffect } from "react";
@@ -92,8 +93,15 @@ export default function SidebarIconRail({
     <aside className="sticky top-0 hidden h-dvh w-20 self-start overscroll-none bg-shell px-3 py-4 lg:flex lg:h-screen">
       <div className="flex h-full w-full flex-col justify-between rounded-3xl bg-rail px-2 py-4 shadow-sm">
         <div className="flex flex-col items-center rounded-3xl bg-surface-soft p-2 shadow-[0_10px_30px_rgba(0,0,0,0.08)]">
-          <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-topbar text-[9px] font-semibold uppercase tracking-[0.3em] text-text-on-dark">
-            HD
+          <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-topbar">
+            <Image
+              src="/icons/sc-logo.png"
+              alt="SC logo"
+              width={24}
+              height={24}
+              className="h-6 w-6 object-contain"
+              priority
+            />
           </div>
           <div className="my-2 h-px w-9 bg-border" />
           <div className="relative flex flex-col items-center gap-2">

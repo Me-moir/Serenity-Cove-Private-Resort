@@ -4,9 +4,17 @@ import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import {
+  BarChart,
   Calendar3,
+  CalendarCheck,
   Clipboard,
+  ClockHistory,
   FileEarmarkCheck,
+  Flag,
+  Gear,
+  Grid1x2,
+  House,
+  PersonCircle,
   ListCheck,
   People,
   Star,
@@ -31,6 +39,13 @@ interface SidebarNavItem {
   href?: string;
   icon: typeof Clipboard;
   badge?: string;
+}
+
+interface MainTabNavItem {
+  id: string;
+  label: string;
+  href: string;
+  icon: typeof Clipboard;
 }
 
 const homeNavItems: SidebarNavItem[] = [
@@ -89,6 +104,47 @@ const settingsNavItems: SidebarNavItem[] = [
   { label: "Preferences", href: "/dashboard/settings/subtab-3", icon: Clipboard }
 ];
 
+const mainTabNavItems: MainTabNavItem[] = [
+  { id: "HomeDashboard", label: "Home", href: "/dashboard/summary", icon: House },
+  {
+    id: "RecordsManagement",
+    label: "Records",
+    href: "/dashboard/records/subtab-1",
+    icon: Grid1x2
+  },
+  {
+    id: "CleaningSchedule",
+    label: "Cleaning",
+    href: "/dashboard/cleaning/subtab-1",
+    icon: CalendarCheck
+  },
+  {
+    id: "ReportsAnalytics",
+    label: "Reports",
+    href: "/dashboard/reports/subtab-1",
+    icon: BarChart
+  },
+  { id: "FlagsMonitoring", label: "Flags", href: "/dashboard/flags/subtab-1", icon: Flag },
+  {
+    id: "ChangelogHistory",
+    label: "Changelog",
+    href: "/dashboard/changelog/subtab-1",
+    icon: ClockHistory
+  },
+  {
+    id: "AdminProfile",
+    label: "Profile",
+    href: "/dashboard/profile/subtab-1",
+    icon: PersonCircle
+  },
+  {
+    id: "DashboardSettings",
+    label: "Settings",
+    href: "/dashboard/settings/subtab-1",
+    icon: Gear
+  }
+];
+
 export default function Sidebar({
   isMobileOpen,
   onClose,
@@ -134,6 +190,8 @@ export default function Sidebar({
     DashboardSettings: { label: "Dashboard", title: "Settings" }
   };
   const activeTitle = titleMap[activeMainTab] ?? titleMap.HomeDashboard;
+  const secondarySectionLabel =
+    activeMainTab === "HomeDashboard" ? "Home Links" : "Subtabs";
 
   useEffect(() => {
     setHasMounted(true);
@@ -196,6 +254,10 @@ export default function Sidebar({
   }, [optimisticHref, pathname]);
 
   useEffect(() => {
+    mainTabNavItems.forEach((item) => {
+      router.prefetch(item.href);
+    });
+
     navItems.forEach((item) => {
       if (item.href) {
         router.prefetch(item.href);
@@ -224,7 +286,43 @@ export default function Sidebar({
         </div>
       </div>
 
+      <div className="mt-4 px-4 md:hidden">
+        <div className="text-[11px] uppercase tracking-[0.2em] text-text-muted">
+          Main Tabs
+        </div>
+        <div className="mt-3 grid grid-cols-2 gap-2">
+          {mainTabNavItems.map((tab) => {
+            const Icon = tab.icon;
+            const isActiveMainTab = activeMainTab === tab.id;
+
+            return (
+              <Link
+                key={tab.id}
+                href={tab.href}
+                prefetch
+                aria-current={isActiveMainTab ? "page" : undefined}
+                className={`flex items-center gap-2 rounded-xl border px-3 py-2 text-xs font-semibold transition ${
+                  isActiveMainTab
+                    ? "border-topbar bg-topbar text-text-on-dark"
+                    : "border-border text-text-on-light hover:bg-shell"
+                }`}
+                onClick={() => {
+                  setOptimisticHref(tab.href);
+                  onClose();
+                }}
+              >
+                <Icon size={14} />
+                <span>{tab.label}</span>
+              </Link>
+            );
+          })}
+        </div>
+      </div>
+
       <nav className="mt-6 flex-1 px-3">
+        <div className="px-2 pb-2 text-[11px] uppercase tracking-[0.2em] text-text-muted md:hidden">
+          {secondarySectionLabel}
+        </div>
         <div className="relative p-2">
           {activeIndex >= 0 ? (
             <span
