@@ -20,7 +20,7 @@ import {
 import { useTheme } from "@/components/theme/ThemeProvider";
 
 const topTabs = [
-  { id: "HomeDashboard", href: "/dashboard/summary", icon: House, label: "Home" },
+  { id: "HomeDashboard", href: "/dashboard/summary", icon: House, label: "Summary" },
   {
     id: "RecordsManagement",
     href: "/dashboard/records/subtab-1",

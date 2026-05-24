@@ -107,7 +107,7 @@ const settingsNavItems: SidebarNavItem[] = [
 const mainTabNavItems: MainTabNavItem[] = [
   {
     id: "HomeDashboard",
-    label: "Home Dashboard",
+    label: "Summary",
     href: "/dashboard/summary",
     icon: House
   },
@@ -189,8 +189,8 @@ export default function Sidebar({
   const activePath = optimisticHref ?? pathname;
   const activeIndex = navItems.findIndex((item) => item.href === activePath);
   const activeBarWidth = INNER_SIDEBAR_WIDTH;
-  const titleMap: Record<string, { label: string; title: string }> = {
-    HomeDashboard: { label: "Home", title: "Dashboard" },
+  const titleMap: Record<string, { label: string; title?: string }> = {
+    HomeDashboard: { label: "Summary" },
     RecordsManagement: { label: "Records", title: "Management" },
     CleaningSchedule: { label: "Cleaning", title: "Schedule" },
     ReportsAnalytics: { label: "Reports", title: "Analytics" },
@@ -290,7 +290,9 @@ export default function Sidebar({
           <div className="text-xs uppercase tracking-[0.3em] text-text-muted">
             {activeTitle.label}
           </div>
-          <div className="text-lg font-semibold">{activeTitle.title}</div>
+          {activeTitle.title ? (
+            <div className="text-lg font-semibold">{activeTitle.title}</div>
+          ) : null}
         </div>
         <div className="hidden md:block">
           <button
