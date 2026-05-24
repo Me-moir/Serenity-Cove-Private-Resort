@@ -54,6 +54,7 @@ export interface Reservation {
   booking_source: "Website" | "Social Media" | "OTA" | "OTC";
   special_notes: string | null;
   created_at: string;
+  actioned_at: string | null;
 }
 
 export interface ReservationWithGuest extends Reservation {

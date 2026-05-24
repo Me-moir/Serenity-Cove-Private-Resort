@@ -67,6 +67,7 @@ const homeNavItems: SidebarNavItem[] = [
 
 const recordsNavItems: SidebarNavItem[] = [
   { label: "Customer Records", href: "/dashboard/records/subtab-1", icon: PersonLinesFill },
+  { label: "Reservation Records", href: "/dashboard/records/subtab-4", icon: FileEarmarkCheck },
   { label: "Financial Records", href: "/dashboard/records/subtab-2", icon: Receipt },
   { label: "Incidents", href: "/dashboard/records/subtab-3", icon: ExclamationTriangle }
 ];

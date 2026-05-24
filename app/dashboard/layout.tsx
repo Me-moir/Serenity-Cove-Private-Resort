@@ -21,6 +21,7 @@ const PRELOAD_NOW_ROUTES = [
 const PRELOAD_IDLE_ROUTES = [
   "/dashboard/records/subtab-2",
   "/dashboard/records/subtab-3",
+  "/dashboard/records/subtab-4",
   "/dashboard/cleaning/subtab-2",
   "/dashboard/cleaning/subtab-3",
   "/dashboard/reports/subtab-2",

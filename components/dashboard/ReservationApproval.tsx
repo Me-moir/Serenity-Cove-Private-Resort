@@ -147,6 +147,25 @@ const inputClass =
 const selectClass =
   "h-10 w-full rounded-xl border border-border bg-shell px-3 text-sm text-text-on-light focus:border-[#9a9a9a] focus:outline-none transition appearance-none";
 
+/* ─── Order ID generator ─────────────────────────────────────────────── */
+
+function generateOrderId(existing: Reservation[]): string {
+  let maxSeq = 0;
+  for (const r of existing) {
+    const m = r.order_id.match(/^RSV-(\d{4})/);
+    if (m) {
+      const n = parseInt(m[1], 10);
+      if (n > maxSeq) maxSeq = n;
+    }
+  }
+  const next = String(maxSeq + 1).padStart(4, "0");
+  const now = new Date();
+  const dd = String(now.getDate()).padStart(2, "0");
+  const m = String(now.getMonth() + 1); // no leading zero
+  const yy = String(now.getFullYear()).slice(-2);
+  return `RSV-${next}${dd}${m}${yy}`;
+}
+
 /* ─── Initial form state ─────────────────────────────────────────────── */
 
 const BLANK_FORM = {
@@ -232,7 +251,6 @@ export default function ReservationApproval({ reservations, guests }: Props) {
     setFormError("");
 
     if (!form.guest_id) return setFormError("Please select a guest.");
-    if (!form.order_id.trim()) return setFormError("Order ID is required.");
     if (!form.check_in_date || !form.check_out_date)
       return setFormError("Check-in and check-out dates are required.");
     if (!form.total_price) return setFormError("Total price is required.");
@@ -339,7 +357,10 @@ export default function ReservationApproval({ reservations, guests }: Props) {
           </div>
           <button
             type="button"
-            onClick={() => setShowModal(true)}
+            onClick={() => {
+              setForm((p) => ({ ...p, order_id: generateOrderId(reservations) }));
+              setShowModal(true);
+            }}
             className="flex h-9 items-center gap-1.5 rounded-xl bg-topbar px-4 text-sm font-medium text-text-on-dark transition hover:opacity-75"
           >
             <PlusLg size={13} />
@@ -568,14 +589,17 @@ export default function ReservationApproval({ reservations, guests }: Props) {
                       </select>
                     </div>
                     <div>
-                      <FieldLabel>Order ID</FieldLabel>
+                      <div className="mb-1.5 flex items-center justify-between">
+                        <FieldLabel>Order ID</FieldLabel>
+                        <span className="rounded-full bg-accent-green/15 px-2 py-0.5 text-[9px] font-bold uppercase tracking-[0.2em] text-accent-green">
+                          Auto
+                        </span>
+                      </div>
                       <input
-                        required
+                        readOnly
                         type="text"
                         value={form.order_id}
-                        onChange={(e) => setField("order_id", e.target.value)}
-                        placeholder="e.g. RSV-0201"
-                        className={inputClass}
+                        className="h-10 w-full cursor-default rounded-xl border border-border bg-shell/50 px-3 font-mono text-sm text-text-muted focus:outline-none"
                       />
                     </div>
                   </div>

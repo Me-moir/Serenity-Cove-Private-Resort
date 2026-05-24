@@ -19,6 +19,7 @@ export async function addGuest(payload: GuestPayload) {
   if (error) throw new Error(error.message);
   revalidatePath("/dashboard/records/subtab-1");
   revalidatePath("/dashboard/guests");
+  revalidatePath("/dashboard/reservation");
 }
 
 export async function updateGuest(guestId: number, payload: GuestPayload) {
@@ -27,6 +28,7 @@ export async function updateGuest(guestId: number, payload: GuestPayload) {
   if (error) throw new Error(error.message);
   revalidatePath("/dashboard/records/subtab-1");
   revalidatePath("/dashboard/guests");
+  revalidatePath("/dashboard/reservation");
 }
 
 export async function deleteGuest(guestId: number) {
@@ -35,4 +37,5 @@ export async function deleteGuest(guestId: number) {
   if (error) throw new Error(error.message);
   revalidatePath("/dashboard/records/subtab-1");
   revalidatePath("/dashboard/guests");
+  revalidatePath("/dashboard/reservation");
 }

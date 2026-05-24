@@ -9,12 +9,12 @@ export default async function ReservationPage() {
   const [reservationsResult, guestsResult] = await Promise.all([
     supabase
       .from("reservations")
-      .select("*, guests(guest_name, guest_type), reservation_addons(addon_name, addon_category)")
+      .select("*, guests(first_name, last_name, guest_type), reservation_addons(addon_name, addon_category)")
       .order("created_at", { ascending: false }),
     supabase
       .from("guests")
       .select("guest_id, first_name, last_name, guest_type")
-      .order("guest_name"),
+      .order("last_name"),
   ]);
 
   return (

@@ -10,10 +10,11 @@ export async function updateApprovalStatus(
   const sb = createSupabaseServiceClient();
   const { error } = await sb
     .from("reservations")
-    .update({ approval_status: status })
+    .update({ approval_status: status, actioned_at: new Date().toISOString() })
     .eq("reservation_id", reservationId);
   if (error) throw new Error(error.message);
   revalidatePath("/dashboard/reservation");
+  revalidatePath("/dashboard/records/subtab-4");
 }
 
 interface ReservationPayload {
@@ -62,5 +63,43 @@ export async function addReservation(
     if (addonError) throw new Error(addonError.message);
   }
 
+  revalidatePath("/dashboard/reservation");
+}
+
+interface RecordEditPayload {
+  approval_status: "Approved" | "Rejected";
+  payment_status: string;
+  check_in_date: string;
+  check_in_time: string;
+  check_out_date: string;
+  check_out_time: string;
+  adult_count: number;
+  children_count: number;
+  total_price: number;
+  special_notes: string | null;
+}
+
+export async function updateReservationRecord(
+  reservationId: number,
+  payload: RecordEditPayload,
+) {
+  const sb = createSupabaseServiceClient();
+  const { error } = await sb
+    .from("reservations")
+    .update(payload)
+    .eq("reservation_id", reservationId);
+  if (error) throw new Error(error.message);
+  revalidatePath("/dashboard/records/subtab-4");
+  revalidatePath("/dashboard/reservation");
+}
+
+export async function deleteReservation(reservationId: number) {
+  const sb = createSupabaseServiceClient();
+  const { error } = await sb
+    .from("reservations")
+    .delete()
+    .eq("reservation_id", reservationId);
+  if (error) throw new Error(error.message);
+  revalidatePath("/dashboard/records/subtab-4");
   revalidatePath("/dashboard/reservation");
 }
