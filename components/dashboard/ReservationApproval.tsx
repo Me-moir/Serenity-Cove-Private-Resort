@@ -756,7 +756,7 @@ export default function ReservationApproval({ reservations, guests }: Props) {
                   </div>
                   {addons.length === 0 ? (
                     <p className="text-xs text-text-muted">
-                      No add-ons yet. Click "Add item" to attach one.
+                      No add-ons yet. Click &quot;Add item&quot; to attach one.
                     </p>
                   ) : (
                     <div className="space-y-2">
