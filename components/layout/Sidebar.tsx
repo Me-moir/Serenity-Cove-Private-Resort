@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import {
   Calendar3,
   Clipboard,
@@ -75,6 +75,8 @@ export default function Sidebar({
   const pathname = usePathname();
   const router = useRouter();
   const panelRef = useRef<HTMLDivElement>(null);
+  const [optimisticHref, setOptimisticHref] = useState<string | null>(null);
+  const [hasMounted, setHasMounted] = useState(false);
   const SIDEBAR_WIDTH = 260;
   const OUTER_SIDEBAR_PADDING = 12; // matches `p-3`
   const NAV_HORIZONTAL_PADDING = 12; // matches `px-3`
@@ -91,7 +93,8 @@ export default function Sidebar({
       : activeMainTab === "CleaningSchedule"
       ? cleaningNavItems
       : reportsNavItems;
-  const activeIndex = navItems.findIndex((item) => item.href === pathname);
+  const activePath = optimisticHref ?? pathname;
+  const activeIndex = navItems.findIndex((item) => item.href === activePath);
   const activeBarWidth = INNER_SIDEBAR_WIDTH;
   const titleMap: Record<string, { label: string; title: string }> = {
     HomeDashboard: { label: "Home", title: "Dashboard" },
@@ -100,6 +103,10 @@ export default function Sidebar({
     ReportsAnalytics: { label: "Reports", title: "Analytics" }
   };
   const activeTitle = titleMap[activeMainTab] ?? titleMap.HomeDashboard;
+
+  useEffect(() => {
+    setHasMounted(true);
+  }, []);
 
   useEffect(() => {
     if (!isMobileOpen) {
@@ -152,12 +159,10 @@ export default function Sidebar({
   }, [isMobileOpen, onClose]);
 
   useEffect(() => {
-    navItems.forEach((item) => {
-      if (item.href) {
-        router.prefetch(item.href);
-      }
-    });
-  }, [navItems, router]);
+    if (optimisticHref === pathname) {
+      setOptimisticHref(null);
+    }
+  }, [optimisticHref, pathname]);
 
   const sidebarContent = (
     <div className="flex h-full flex-col">
@@ -182,7 +187,9 @@ export default function Sidebar({
         <div className="relative p-2">
           {activeIndex >= 0 ? (
             <span
-              className="pointer-events-none absolute h-11 bg-topbar transition-transform duration-200 ease-out"
+              className={`pointer-events-none absolute h-11 bg-topbar ${
+                hasMounted ? "transition-transform duration-200 ease-out" : ""
+              }`}
               style={{
                 left: activeBarLeftOffset,
                 width: activeBarWidth,
@@ -194,7 +201,7 @@ export default function Sidebar({
           ) : null}
           <div className="relative z-10 flex flex-col gap-1">
             {navItems.map((item) => {
-              const isActive = item.href ? pathname === item.href : false;
+              const isActive = item.href ? activePath === item.href : false;
               const Icon = item.icon;
               const content = (
                 <>
@@ -221,6 +228,11 @@ export default function Sidebar({
                   prefetch
                   className={className}
                   aria-label={item.label}
+                  onClick={() => {
+                    if (item.href) {
+                      setOptimisticHref(item.href);
+                    }
+                  }}
                 >
                   {content}
                 </Link>
@@ -271,7 +283,7 @@ export default function Sidebar({
   return (
     <>
       <aside
-        className="hidden h-screen overflow-hidden bg-shell text-text-on-light md:flex flex-none shrink-0 motion-reduce:transition-none"
+        className="sticky top-0 hidden h-dvh self-start overflow-hidden overscroll-none bg-shell text-text-on-light md:flex md:h-screen flex-none shrink-0 motion-reduce:transition-none"
         style={{
           width: isCollapsed ? 0 : SIDEBAR_WIDTH,
           transition: `width ${SIDEBAR_ANIMATION_MS}ms ${SIDEBAR_EASING}`

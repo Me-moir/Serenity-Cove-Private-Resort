@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useRouter } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { useEffect } from "react";
 import type { MouseEvent } from "react";
 import {
@@ -40,7 +40,15 @@ export default function SidebarIconRail({
   activeTab,
   onSelectTab
 }: SidebarIconRailProps) {
+  const pathname = usePathname();
   const router = useRouter();
+  const currentPathTab = pathname.startsWith("/dashboard/records")
+    ? "RecordsManagement"
+    : pathname.startsWith("/dashboard/cleaning")
+    ? "CleaningSchedule"
+    : pathname.startsWith("/dashboard/reports")
+    ? "ReportsAnalytics"
+    : "HomeDashboard";
   const activeIndex = topTabs.findIndex((tab) => tab.id === activeTab);
   const railStep = 44;
 
@@ -51,7 +59,7 @@ export default function SidebarIconRail({
   }, [router]);
 
   return (
-    <aside className="hidden h-screen w-20 bg-shell px-3 py-4 lg:flex">
+    <aside className="sticky top-0 hidden h-dvh w-20 self-start overscroll-none bg-shell px-3 py-4 lg:flex lg:h-screen">
       <div className="flex h-full w-full flex-col justify-between rounded-3xl bg-rail px-2 py-4 shadow-sm">
           <div className="flex flex-col items-center rounded-3xl bg-white/70 p-2 shadow-[0_10px_30px_rgba(0,0,0,0.08)]">
             <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-topbar text-[9px] font-semibold uppercase tracking-[0.3em] text-text-on-dark">
@@ -72,8 +80,10 @@ export default function SidebarIconRail({
               {topTabs.map((tab) => {
                 const Icon = tab.icon;
                 const isActive = activeTab === tab.id;
+                const shouldStayOnCurrentPath = currentPathTab === tab.id;
+                const destinationHref = shouldStayOnCurrentPath ? pathname : tab.href;
                 const handleTopTabClick = (event: MouseEvent<HTMLAnchorElement>) => {
-                  if (isActive) {
+                  if (shouldStayOnCurrentPath) {
                     event.preventDefault();
                   }
 
@@ -83,7 +93,7 @@ export default function SidebarIconRail({
                 return (
                   <Link
                     key={tab.label}
-                    href={tab.href}
+                    href={destinationHref}
                     prefetch
                     onClick={handleTopTabClick}
                     className={`relative z-10 flex h-9 w-9 items-center justify-center rounded-md border border-transparent ${
