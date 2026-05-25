@@ -21,6 +21,8 @@
   --color-slider-line: #94A3B8;
   --color-surface-soft: rgba(255, 255, 255, 0.82);
   --color-surface-soft-hover: #FFFFFF;
+  --chart-stroke: #111111;
+  --chart-dot-bg: #FFFFFF;
 }
 
 [data-theme="dark"] {
@@ -42,6 +44,8 @@
   --color-slider-line: #5B6675;
   --color-surface-soft: rgba(255, 255, 255, 0.06);
   --color-surface-soft-hover: #2A2A2A;
+  --chart-stroke: #FFFFFF;
+  --chart-dot-bg: #1D1D1D;
 }
 
 

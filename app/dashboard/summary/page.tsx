@@ -26,7 +26,7 @@ export default async function SummaryPage() {
     { label: "Pending Approval", value: reservationStats.pending.toLocaleString() },
     { label: "Rejected", value: reservationStats.rejected.toLocaleString() },
     { label: "Total Guests Served", value: reservationStats.totalGuests.toLocaleString() },
-    { label: "Revenue (Fully Paid)", value: PHP(reservationStats.totalRevenue) },
+    { label: "Fully Paid Value", value: PHP(reservationStats.totalRevenue) },
   ];
 
   return (

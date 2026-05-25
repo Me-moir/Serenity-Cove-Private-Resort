@@ -17,7 +17,7 @@ export async function addGuest(payload: GuestPayload) {
   const sb = createSupabaseServiceClient();
   const { error } = await sb.from("guests").insert(payload);
   if (error) throw new Error(error.message);
-  revalidatePath("/dashboard/records/subtab-1");
+  revalidatePath("/dashboard/records/guest-records");
   revalidatePath("/dashboard/guests");
   revalidatePath("/dashboard/reservation");
 }
@@ -26,7 +26,7 @@ export async function updateGuest(guestId: number, payload: GuestPayload) {
   const sb = createSupabaseServiceClient();
   const { error } = await sb.from("guests").update(payload).eq("guest_id", guestId);
   if (error) throw new Error(error.message);
-  revalidatePath("/dashboard/records/subtab-1");
+  revalidatePath("/dashboard/records/guest-records");
   revalidatePath("/dashboard/guests");
   revalidatePath("/dashboard/reservation");
 }
@@ -63,9 +63,9 @@ export async function deleteGuest(guestId: number) {
   const { error } = await sb.from("guests").delete().eq("guest_id", guestId);
   if (error) throw new Error(error.message);
 
-  revalidatePath("/dashboard/records/subtab-1");
+  revalidatePath("/dashboard/records/guest-records");
   revalidatePath("/dashboard/guests");
   revalidatePath("/dashboard/reservation");
-  revalidatePath("/dashboard/records/subtab-2");
-  revalidatePath("/dashboard/records/subtab-3");
+  revalidatePath("/dashboard/records/financial-records");
+  revalidatePath("/dashboard/records/incidents");
 }

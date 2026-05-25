@@ -13,14 +13,14 @@ export async function updateStaff(id: number, payload: StaffPayload) {
   const sb = createSupabaseServiceClient();
   const { error } = await sb.from("staff").update(payload).eq("staff_id", id);
   if (error) throw new Error(error.message);
-  revalidatePath("/dashboard/records/subtab-5");
+  revalidatePath("/dashboard/records/staff-roster");
 }
 
 export async function deleteStaff(id: number) {
   const sb = createSupabaseServiceClient();
   const { error } = await sb.from("staff").delete().eq("staff_id", id);
   if (error) throw new Error(error.message);
-  revalidatePath("/dashboard/records/subtab-5");
+  revalidatePath("/dashboard/records/staff-roster");
 }
 
 export async function getStaffForProvider() {

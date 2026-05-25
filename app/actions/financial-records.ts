@@ -14,12 +14,12 @@ export async function updateFinancialRecord(id: number, payload: FinancialRecord
   const sb = createSupabaseServiceClient();
   const { error } = await sb.from("financial_records").update(payload).eq("record_id", id);
   if (error) throw new Error(error.message);
-  revalidatePath("/dashboard/records/subtab-2");
+  revalidatePath("/dashboard/records/financial-records");
 }
 
 export async function deleteFinancialRecord(id: number) {
   const sb = createSupabaseServiceClient();
   const { error } = await sb.from("financial_records").delete().eq("record_id", id);
   if (error) throw new Error(error.message);
-  revalidatePath("/dashboard/records/subtab-2");
+  revalidatePath("/dashboard/records/financial-records");
 }

@@ -28,34 +28,34 @@ const topTabs = [
   },
   {
     id: "RecordsManagement",
-    href: "/dashboard/records/subtab-1",
+    href: "/dashboard/records/guest-records",
     icon: Grid1x2,
     label: "Records"
   },
   {
     id: "Maintenance",
-    href: "/dashboard/cleaning/subtab-1",
+    href: "/dashboard/cleaning/venue-overview",
     icon: Tools,
     label: "Maintenance"
   },
   {
     id: "ReportsAnalytics",
-    href: "/dashboard/reports/subtab-1",
+    href: "/dashboard/reports/occupancy-reports",
     icon: BarChart,
     label: "Reports"
   }
 ];
 
 const bottomTabs = [
-  { id: "FlagsMonitoring", href: "/dashboard/flags/subtab-1", icon: Flag, label: "Flags" },
+  { id: "FlagsMonitoring", href: "/dashboard/flags/system-flags", icon: Flag, label: "Flags" },
   {
     id: "ChangelogHistory",
-    href: "/dashboard/changelog/subtab-1",
+    href: "/dashboard/changelog/recent-updates",
     icon: ClockHistory,
     label: "Changelog"
   },
-  { id: "AdminProfile", href: "/dashboard/profile/subtab-1", icon: PersonCircle, label: "Profile" },
-  { id: "DashboardSettings", href: "/dashboard/settings/subtab-1", icon: Gear, label: "Settings" }
+  { id: "AdminProfile", href: "/dashboard/profile/personal-information", icon: PersonCircle, label: "Profile" },
+  { id: "DashboardSettings", href: "/dashboard/settings/general-settings", icon: Gear, label: "Settings" }
 ];
 
 interface SidebarIconRailProps {

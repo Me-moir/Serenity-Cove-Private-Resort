@@ -5,26 +5,42 @@ import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import {
   BarChart,
+  BarChartFill,
+  BugFill,
   Calendar3,
   Clipboard,
-  Tools,
+  ClipboardCheck,
+  Cloud,
   ClockHistory,
   ExclamationTriangle,
   FileEarmarkCheck,
   Flag,
+  FlagFill,
   Gear,
+  GearFill,
+  GraphUp,
   Grid1x2,
   House,
-  PersonCircle,
-  PersonLinesFill,
+  HouseDoor,
+  JournalText,
+  LayoutSidebar,
   ListCheck,
   People,
-  Receipt,
-  Star,
-  X,
-  LayoutSidebar,
+  PeopleFill,
+  PersonBadgeFill,
+  PersonCircle,
+  PersonLinesFill,
   QuestionCircle,
-  Telephone
+  Receipt,
+  ShieldLockFill,
+  Sliders,
+  Speedometer2,
+  Star,
+  Stars,
+  Telephone,
+  Tools,
+  Wrench,
+  X,
 } from "react-bootstrap-icons";
 import Badge from "@/components/ui/Badge";
 import CommandMenu from "@/components/layout/CommandMenu";
@@ -66,48 +82,48 @@ const homeNavItems: SidebarNavItem[] = [
 ];
 
 const recordsNavItems: SidebarNavItem[] = [
-  { label: "Guest Records", href: "/dashboard/records/subtab-1", icon: PersonLinesFill },
-  { label: "Reservation Records", href: "/dashboard/records/subtab-4", icon: FileEarmarkCheck },
-  { label: "Financial Records", href: "/dashboard/records/subtab-2", icon: Receipt },
-  { label: "Incidents", href: "/dashboard/records/subtab-3", icon: ExclamationTriangle },
-  { label: "Staff Roster", href: "/dashboard/records/subtab-5", icon: People },
-  { label: "Venue Price List", href: "/dashboard/records/subtab-6", icon: Grid1x2 }
+  { label: "Guest Records", href: "/dashboard/records/guest-records", icon: PersonLinesFill },
+  { label: "Reservation Records", href: "/dashboard/records/reservation-records", icon: FileEarmarkCheck },
+  { label: "Financial Records", href: "/dashboard/records/financial-records", icon: Receipt },
+  { label: "Incidents", href: "/dashboard/records/incidents", icon: ExclamationTriangle },
+  { label: "Staff Roster", href: "/dashboard/records/staff-roster", icon: People },
+  { label: "Venue Price List", href: "/dashboard/records/venue-price-list", icon: Grid1x2 }
 ];
 
 const maintenanceNavItems: SidebarNavItem[] = [
-  { label: "Venue Preparation", href: "/dashboard/cleaning/subtab-1", icon: Clipboard },
-  { label: "Room Inspection", href: "/dashboard/cleaning/subtab-2", icon: Clipboard },
-  { label: "Maintenance Log", href: "/dashboard/cleaning/subtab-3", icon: Clipboard }
+  { label: "Venue Overview", href: "/dashboard/cleaning/venue-overview", icon: Grid1x2 },
+  { label: "Room Inspection", href: "/dashboard/cleaning/room-inspection", icon: ClipboardCheck },
+  { label: "Venue Preparation", href: "/dashboard/cleaning/venue-preparation", icon: HouseDoor }
 ];
 
 const reportsNavItems: SidebarNavItem[] = [
-  { label: "Occupancy Reports", href: "/dashboard/reports/subtab-1", icon: Clipboard },
-  { label: "Revenue Reports", href: "/dashboard/reports/subtab-2", icon: Clipboard },
-  { label: "Guest Analytics", href: "/dashboard/reports/subtab-3", icon: Clipboard }
+  { label: "Occupancy Reports", href: "/dashboard/reports/occupancy-reports", icon: BarChartFill },
+  { label: "Revenue Reports", href: "/dashboard/reports/revenue-reports", icon: GraphUp },
+  { label: "Guest Analytics", href: "/dashboard/reports/guest-analytics", icon: PeopleFill }
 ];
 
 const flagsNavItems: SidebarNavItem[] = [
-  { label: "System Flags", href: "/dashboard/flags/subtab-1", icon: Clipboard },
-  { label: "Crash & Downtime", href: "/dashboard/flags/subtab-2", icon: Clipboard },
-  { label: "Traffic Monitor", href: "/dashboard/flags/subtab-3", icon: Clipboard }
+  { label: "System Flags", href: "/dashboard/flags/system-flags", icon: FlagFill },
+  { label: "Crash & Downtime", href: "/dashboard/flags/crash-downtime", icon: BugFill },
+  { label: "Traffic Monitor", href: "/dashboard/flags/traffic-monitor", icon: Speedometer2 }
 ];
 
 const changelogNavItems: SidebarNavItem[] = [
-  { label: "Recent Updates", href: "/dashboard/changelog/subtab-1", icon: Clipboard },
-  { label: "Patches", href: "/dashboard/changelog/subtab-2", icon: Clipboard },
-  { label: "Revamps", href: "/dashboard/changelog/subtab-3", icon: Clipboard }
+  { label: "Recent Updates", href: "/dashboard/changelog/recent-updates", icon: ClockHistory },
+  { label: "Patches", href: "/dashboard/changelog/patches", icon: Wrench },
+  { label: "Revamps", href: "/dashboard/changelog/revamps", icon: Stars }
 ];
 
 const profileNavItems: SidebarNavItem[] = [
-  { label: "Personal Information", href: "/dashboard/profile/subtab-1", icon: Clipboard },
-  { label: "Password & Security", href: "/dashboard/profile/subtab-2", icon: Clipboard },
-  { label: "Activity Logs", href: "/dashboard/profile/subtab-3", icon: Clipboard }
+  { label: "Personal Information", href: "/dashboard/profile/personal-information", icon: PersonBadgeFill },
+  { label: "Password & Security", href: "/dashboard/profile/password-security", icon: ShieldLockFill },
+  { label: "Activity Logs", href: "/dashboard/profile/activity-logs", icon: JournalText }
 ];
 
 const settingsNavItems: SidebarNavItem[] = [
-  { label: "General Settings", href: "/dashboard/settings/subtab-1", icon: Clipboard },
-  { label: "System Integrations", href: "/dashboard/settings/subtab-2", icon: Clipboard },
-  { label: "Preferences", href: "/dashboard/settings/subtab-3", icon: Clipboard }
+  { label: "General Settings", href: "/dashboard/settings/general-settings", icon: GearFill },
+  { label: "System Integrations", href: "/dashboard/settings/system-integrations", icon: Cloud },
+  { label: "Preferences", href: "/dashboard/settings/preferences", icon: Sliders }
 ];
 
 const mainTabNavItems: MainTabNavItem[] = [
@@ -120,43 +136,43 @@ const mainTabNavItems: MainTabNavItem[] = [
   {
     id: "RecordsManagement",
     label: "Records Management",
-    href: "/dashboard/records/subtab-1",
+    href: "/dashboard/records/guest-records",
     icon: Grid1x2
   },
   {
     id: "Maintenance",
     label: "Maintenance",
-    href: "/dashboard/cleaning/subtab-1",
+    href: "/dashboard/cleaning/venue-overview",
     icon: Tools
   },
   {
     id: "ReportsAnalytics",
     label: "Reports Analytics",
-    href: "/dashboard/reports/subtab-1",
+    href: "/dashboard/reports/occupancy-reports",
     icon: BarChart
   },
   {
     id: "FlagsMonitoring",
     label: "Flags Monitoring",
-    href: "/dashboard/flags/subtab-1",
+    href: "/dashboard/flags/system-flags",
     icon: Flag
   },
   {
     id: "ChangelogHistory",
     label: "System Changelog",
-    href: "/dashboard/changelog/subtab-1",
+    href: "/dashboard/changelog/recent-updates",
     icon: ClockHistory
   },
   {
     id: "AdminProfile",
     label: "Admin Profile",
-    href: "/dashboard/profile/subtab-1",
+    href: "/dashboard/profile/personal-information",
     icon: PersonCircle
   },
   {
     id: "DashboardSettings",
     label: "Dashboard Settings",
-    href: "/dashboard/settings/subtab-1",
+    href: "/dashboard/settings/general-settings",
     icon: Gear
   }
 ];

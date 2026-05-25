@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useRef, useState } from "react";
+import { createPortal } from "react-dom";
 import { usePathname, useRouter } from "next/navigation";
 import { ArrowUpRight, ClockHistory, Search, Star, X } from "react-bootstrap-icons";
 
@@ -67,147 +68,147 @@ const SEARCH_ITEMS: SearchItem[] = [
   },
   {
     label: "Guest Records",
-    href: "/dashboard/records/subtab-1",
+    href: "/dashboard/records/guest-records",
     group: "Records",
     description: "Guest profiles and booking history.",
     keywords: ["guests", "profiles", "records"]
   },
   {
     label: "Financial Records",
-    href: "/dashboard/records/subtab-2",
+    href: "/dashboard/records/financial-records",
     group: "Records",
     description: "Financial transactions and billing.",
     keywords: ["financial", "billing", "payments"]
   },
   {
     label: "Incidents",
-    href: "/dashboard/records/subtab-3",
+    href: "/dashboard/records/incidents",
     group: "Records",
     description: "Incident reports and history.",
     keywords: ["incidents", "reports", "issues"]
   },
   {
-    label: "Venue Preparation",
-    href: "/dashboard/cleaning/subtab-1",
+    label: "Venue Overview",
+    href: "/dashboard/cleaning/venue-overview",
     group: "Maintenance",
-    description: "Area-by-area preparation checklist.",
-    keywords: ["venue", "preparation", "checklist", "cleaning"]
+    description: "Live status board for all rooms, staff on shift, and flagged notes.",
+    keywords: ["venue", "overview", "status", "board", "rooms"]
   },
   {
     label: "Room Inspection",
-    href: "/dashboard/cleaning/subtab-2",
+    href: "/dashboard/cleaning/room-inspection",
     group: "Maintenance",
-    description: "Room inspection checklist.",
-    keywords: ["inspection", "rooms", "maintenance"]
+    description: "Post check-out inspection and damage notes.",
+    keywords: ["inspection", "checkout", "damage", "rooms"]
   },
   {
-    label: "Maintenance Log",
-    href: "/dashboard/cleaning/subtab-3",
+    label: "Venue Preparation",
+    href: "/dashboard/cleaning/venue-preparation",
     group: "Maintenance",
-    description: "Maintenance tasks and activity log.",
-    keywords: ["maintenance", "log", "tasks"]
+    description: "Area-by-area prep checklist for incoming check-ins.",
+    keywords: ["venue", "preparation", "checklist", "cleaning", "prep"]
   },
   {
     label: "Occupancy Reports",
-    href: "/dashboard/reports/subtab-1",
+    href: "/dashboard/reports/occupancy-reports",
     group: "Reports",
     description: "Occupancy rates and booking summaries.",
     keywords: ["occupancy", "bookings", "availability"]
   },
   {
     label: "Revenue Reports",
-    href: "/dashboard/reports/subtab-2",
+    href: "/dashboard/reports/revenue-reports",
     group: "Reports",
     description: "Revenue breakdown and financial reports.",
     keywords: ["revenue", "income", "financial", "reports"]
   },
   {
     label: "Guest Analytics",
-    href: "/dashboard/reports/subtab-3",
+    href: "/dashboard/reports/guest-analytics",
     group: "Reports",
     description: "Guest trends and behaviour analytics.",
     keywords: ["analytics", "guests", "trends"]
   },
   {
     label: "System Flags",
-    href: "/dashboard/flags/subtab-1",
+    href: "/dashboard/flags/system-flags",
     group: "Flags",
     description: "Flagged incidents and alerts.",
     keywords: ["flags", "alerts", "incidents"]
   },
   {
     label: "Crash & Downtime",
-    href: "/dashboard/flags/subtab-2",
+    href: "/dashboard/flags/crash-downtime",
     group: "Flags",
     description: "Downtime and crash monitoring.",
     keywords: ["downtime", "crash", "issues"]
   },
   {
     label: "Traffic Monitor",
-    href: "/dashboard/flags/subtab-3",
+    href: "/dashboard/flags/traffic-monitor",
     group: "Flags",
     description: "Traffic and system load monitoring.",
     keywords: ["traffic", "monitoring", "performance"]
   },
   {
     label: "Recent Updates",
-    href: "/dashboard/changelog/subtab-1",
+    href: "/dashboard/changelog/recent-updates",
     group: "Changelog",
     description: "Latest updates and improvements.",
     keywords: ["changelog", "updates", "release notes"]
   },
   {
     label: "Patches",
-    href: "/dashboard/changelog/subtab-2",
+    href: "/dashboard/changelog/patches",
     group: "Changelog",
     description: "Patch list and bug fixes.",
     keywords: ["patches", "fixes", "changelog"]
   },
   {
     label: "Revamps",
-    href: "/dashboard/changelog/subtab-3",
+    href: "/dashboard/changelog/revamps",
     group: "Changelog",
     description: "Major redesigns and feature revamps.",
     keywords: ["revamp", "redesign", "changes"]
   },
   {
     label: "Account Overview",
-    href: "/dashboard/profile/subtab-1",
+    href: "/dashboard/profile/personal-information",
     group: "Profile",
     description: "Admin account information.",
     keywords: ["profile", "account", "admin"]
   },
   {
     label: "Access & Roles",
-    href: "/dashboard/profile/subtab-2",
+    href: "/dashboard/profile/password-security",
     group: "Profile",
     description: "Permission and role settings.",
     keywords: ["roles", "permissions", "access"]
   },
   {
     label: "Activity Logs",
-    href: "/dashboard/profile/subtab-3",
+    href: "/dashboard/profile/activity-logs",
     group: "Profile",
     description: "Recent account activity logs.",
     keywords: ["activity", "logs", "security"]
   },
   {
     label: "Appearance",
-    href: "/dashboard/settings/subtab-1",
+    href: "/dashboard/settings/general-settings",
     group: "Settings",
     description: "Theme and appearance preferences.",
     keywords: ["settings", "theme", "appearance"]
   },
   {
     label: "Notifications",
-    href: "/dashboard/settings/subtab-2",
+    href: "/dashboard/settings/system-integrations",
     group: "Settings",
     description: "Notification preferences.",
     keywords: ["settings", "notifications", "alerts"]
   },
   {
     label: "Preferences",
-    href: "/dashboard/settings/subtab-3",
+    href: "/dashboard/settings/preferences",
     group: "Settings",
     description: "General application preferences.",
     keywords: ["settings", "preferences", "options"]
@@ -217,9 +218,9 @@ const SEARCH_ITEMS: SearchItem[] = [
 const RECOMMENDED_HREFS = [
   "/dashboard/summary",
   "/dashboard/calendar",
-  "/dashboard/reports/subtab-1",
-  "/dashboard/flags/subtab-1",
-  "/dashboard/settings/subtab-1"
+  "/dashboard/reports/occupancy-reports",
+  "/dashboard/flags/system-flags",
+  "/dashboard/settings/general-settings"
 ];
 
 const itemByHref = Object.fromEntries(SEARCH_ITEMS.map((item) => [item.href, item]));
@@ -450,72 +451,75 @@ export default function CommandMenu() {
         </kbd>
       </button>
 
-      {isOpen ? (
-        <div className="fixed inset-0 z-[9999] flex items-start justify-center p-4 pt-20 sm:p-8 sm:pt-24">
-          <button
-            type="button"
-            className="absolute inset-0 bg-black/55 backdrop-blur-[2px]"
-            aria-label="Close search modal"
-            onClick={() => setIsOpen(false)}
-          />
-          <div
-            ref={modalRef}
-            role="dialog"
-            aria-modal="true"
-            aria-label="Search Dashboard"
-            className="relative z-10 w-full max-w-2xl overflow-hidden rounded-3xl border border-white/10 bg-sidebar text-text-on-light shadow-[0_20px_80px_rgba(0,0,0,0.35)]"
-          >
-            <div className="flex items-center gap-3 border-b border-border/50 px-4 py-3 sm:px-5">
-              <Search size={16} className="text-text-muted" />
-              <input
-                ref={inputRef}
-                type="text"
-                value={query}
-                onChange={(event) => setQuery(event.target.value)}
-                onKeyDown={handleInputKeyDown}
-                placeholder="Search pages, subtabs, and settings..."
-                className="w-full bg-transparent text-sm outline-none placeholder:text-text-muted"
-                aria-label="Search dashboard routes"
-              />
+      {isOpen
+        ? createPortal(
+            <div className="fixed inset-0 z-[9999] flex items-start justify-center p-4 pt-20 sm:p-8 sm:pt-24">
               <button
                 type="button"
+                className="absolute inset-0 bg-black/55 backdrop-blur-[2px]"
+                aria-label="Close search modal"
                 onClick={() => setIsOpen(false)}
-                className="rounded-full p-2 text-text-muted hover:bg-surface-soft"
-                aria-label="Close search"
+              />
+              <div
+                ref={modalRef}
+                role="dialog"
+                aria-modal="true"
+                aria-label="Search Dashboard"
+                className="relative z-10 w-full max-w-2xl overflow-hidden rounded-3xl border border-white/10 bg-sidebar text-text-on-light shadow-[0_20px_80px_rgba(0,0,0,0.35)]"
               >
-                <X size={16} />
-              </button>
-            </div>
+                <div className="flex items-center gap-3 border-b border-border/50 px-4 py-3 sm:px-5">
+                  <Search size={16} className="text-text-muted" />
+                  <input
+                    ref={inputRef}
+                    type="text"
+                    value={query}
+                    onChange={(event) => setQuery(event.target.value)}
+                    onKeyDown={handleInputKeyDown}
+                    placeholder="Search pages, subtabs, and settings..."
+                    className="w-full bg-transparent text-sm outline-none placeholder:text-text-muted"
+                    aria-label="Search dashboard routes"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setIsOpen(false)}
+                    className="rounded-full p-2 text-text-muted hover:bg-surface-soft"
+                    aria-label="Close search"
+                  >
+                    <X size={16} />
+                  </button>
+                </div>
 
-            <div className="max-h-[65vh] overflow-y-auto p-4 sm:p-5">
-              <SearchSection
-                title={hasQuery ? "Search Results" : "Recommendations"}
-                icon={hasQuery ? <Search size={14} /> : <Star size={14} />}
-                emptyMessage={hasQuery ? "No result found for your search." : undefined}
-                items={primaryList}
-                onSelect={goTo}
-              />
+                <div className="max-h-[65vh] overflow-y-auto p-4 sm:p-5">
+                  <SearchSection
+                    title={hasQuery ? "Search Results" : "Recommendations"}
+                    icon={hasQuery ? <Search size={14} /> : <Star size={14} />}
+                    emptyMessage={hasQuery ? "No result found for your search." : undefined}
+                    items={primaryList}
+                    onSelect={goTo}
+                  />
 
-              <SearchSection
-                title="Frequently Searched"
-                icon={<ClockHistory size={14} />}
-                emptyMessage="Your frequently searched pages will appear here."
-                items={frequentItems}
-                onSelect={goTo}
-              />
+                  <SearchSection
+                    title="Frequently Searched"
+                    icon={<ClockHistory size={14} />}
+                    emptyMessage="Your frequently searched pages will appear here."
+                    items={frequentItems}
+                    onSelect={goTo}
+                  />
 
-              {noResultState ? (
-                <SearchSection
-                  title="Try These Instead"
-                  icon={<Star size={14} />}
-                  items={recommendedItems}
-                  onSelect={goTo}
-                />
-              ) : null}
-            </div>
-          </div>
-        </div>
-      ) : null}
+                  {noResultState ? (
+                    <SearchSection
+                      title="Try These Instead"
+                      icon={<Star size={14} />}
+                      items={recommendedItems}
+                      onSelect={goTo}
+                    />
+                  ) : null}
+                </div>
+              </div>
+            </div>,
+            document.body,
+          )
+        : null}
     </>
   );
 }

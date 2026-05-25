@@ -179,29 +179,9 @@ const inputClass =
 const selectClass =
   "h-10 w-full rounded-xl border border-border bg-shell px-3 text-sm text-text-on-light focus:border-[#9a9a9a] focus:outline-none transition appearance-none";
 
-/* ─── Order ID generator ─────────────────────────────────────────────── */
-
-function generateOrderId(existing: Reservation[]): string {
-  let maxSeq = 0;
-  for (const r of existing) {
-    const m = r.order_id.match(/^RSV-(\d{4})/);
-    if (m) {
-      const n = parseInt(m[1], 10);
-      if (n > maxSeq) maxSeq = n;
-    }
-  }
-  const next = String(maxSeq + 1).padStart(4, "0");
-  const now = new Date();
-  const dd = String(now.getDate()).padStart(2, "0");
-  const mo = String(now.getMonth() + 1);
-  const yy = String(now.getFullYear()).slice(-2);
-  return `RSV-${next}${dd}${mo}${yy}`;
-}
-
 /* ─── Initial form state ─────────────────────────────────────────────── */
 
 const BLANK_FORM = {
-  order_id: "",
   guest_id: "",
   check_in_date: "",
   check_in_time: "14:00",
@@ -348,7 +328,6 @@ export default function ReservationApproval({ reservations, guests, venues }: Pr
     try {
       await addReservation(
         {
-          order_id: form.order_id.trim(),
           guest_id: guestId,
           check_in_date: form.check_in_date,
           check_in_time: form.check_in_time,
@@ -460,7 +439,6 @@ export default function ReservationApproval({ reservations, guests, venues }: Pr
           <button
             type="button"
             onClick={() => {
-              setForm((p) => ({ ...p, order_id: generateOrderId(reservations) }));
               setShowModal(true);
             }}
             className="flex h-9 items-center gap-1.5 rounded-xl bg-topbar px-4 text-sm font-medium text-text-on-dark transition hover:opacity-75"
@@ -600,11 +578,6 @@ export default function ReservationApproval({ reservations, guests, venues }: Pr
                         >
                           {res.payment_status}
                         </div>
-                        <div
-                          className={`mt-0.5 text-[10px] uppercase tracking-[0.15em] ${approvalColor[res.approval_status] ?? "text-text-muted"}`}
-                        >
-                          {res.approval_status}
-                        </div>
                       </td>
 
                       {/* Requests */}
@@ -718,12 +691,9 @@ export default function ReservationApproval({ reservations, guests, venues }: Pr
                           Auto
                         </span>
                       </div>
-                      <input
-                        readOnly
-                        type="text"
-                        value={form.order_id}
-                        className="h-10 w-full cursor-default rounded-xl border border-border bg-shell/50 px-3 font-mono text-sm text-text-muted focus:outline-none"
-                      />
+                      <div className="flex h-10 w-full items-center rounded-xl border border-border bg-shell/50 px-3 font-mono text-sm text-text-muted">
+                        Auto-assigned on save
+                      </div>
                     </div>
                   </div>
                 </fieldset>

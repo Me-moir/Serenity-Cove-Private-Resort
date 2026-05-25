@@ -23,8 +23,11 @@ export default function FinanceCard({ summary }: FinanceCardProps) {
 
   return (
     <div className="rounded-3xl bg-card-dark p-6 text-text-on-dark">
-      <div className="text-xs uppercase tracking-[0.3em] text-text-on-dark/70">
-        Finance Summary
+      <div className="flex items-center justify-between">
+        <div className="text-xs uppercase tracking-[0.3em] text-text-on-dark/70">
+          Finance Summary
+        </div>
+        <span className="text-[10px] font-medium text-text-on-dark/40 tracking-wide">All time</span>
       </div>
       <div className="mt-4 space-y-3">
         {rows.map((row) => (

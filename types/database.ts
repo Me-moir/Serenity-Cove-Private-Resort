@@ -164,6 +164,11 @@ export interface VenuePriceList {
   created_at: string;
 }
 
+export interface ReservationWithGuestAndAddons extends Reservation {
+  guests: Pick<Guest, "first_name" | "last_name" | "guest_type"> | null;
+  reservation_addons: Pick<ReservationAddon, "addon_name" | "addon_category">[];
+}
+
 export interface GuestStats {
   total: number;
   new: number;
