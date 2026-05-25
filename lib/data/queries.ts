@@ -77,13 +77,41 @@ export async function getReservations(): Promise<ReservationWithGuest[]> {
 
 export async function getReviews(): Promise<ReviewWithGuest[]> {
   const supabase = createSupabaseServiceClient();
-  const { data, error } = await supabase
+
+  const { data: reviews, error } = await supabase
     .from("reviews")
-    .select("*, guests(first_name, last_name, guest_type), reservations(order_id)")
+    .select("review_id, guest_id, reservation_id, rating, review_text, review_date")
     .order("review_date", { ascending: false });
 
-  if (error || !data) return [];
-  return data as ReviewWithGuest[];
+  if (error) {
+    console.error("[getReviews]", error.message);
+    return [];
+  }
+  if (!reviews?.length) return [];
+
+  const guestIds = [...new Set(reviews.map((r) => r.guest_id))];
+  const { data: guests, error: guestError } = await supabase
+    .from("guests")
+    .select("guest_id, first_name, last_name, guest_type")
+    .in("guest_id", guestIds);
+
+  if (guestError) console.error("[getReviews guests]", guestError.message);
+
+  const guestMap = Object.fromEntries(
+    (guests ?? []).map((g) => [g.guest_id, g]),
+  );
+
+  return reviews.map((r) => ({
+    ...r,
+    guests: guestMap[r.guest_id]
+      ? {
+          first_name: guestMap[r.guest_id].first_name,
+          last_name: guestMap[r.guest_id].last_name,
+          guest_type: guestMap[r.guest_id].guest_type,
+        }
+      : null,
+    reservations: null,
+  })) as ReviewWithGuest[];
 }
 
 export async function getCleaningTasks(
@@ -157,6 +185,18 @@ export async function getStaff(): Promise<Staff[]> {
 
   if (error || !data) return [];
   return data as Staff[];
+}
+
+export async function getVenuePriceList() {
+  const supabase = createSupabaseServiceClient();
+  const { data, error } = await supabase
+    .from("venue_price_list")
+    .select("*")
+    .order("category")
+    .order("venue_name");
+
+  if (error || !data) return [];
+  return data;
 }
 
 export async function getReservationStats() {

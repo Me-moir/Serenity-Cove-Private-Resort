@@ -3,6 +3,7 @@
 import { useMemo, useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import {
+  ArrowClockwise,
   CheckCircleFill,
   ClockHistory,
   HourglassSplit,
@@ -18,6 +19,11 @@ import { addReservation, updateApprovalStatus } from "@/app/actions/reservations
 interface Addon {
   addon_name: string;
   addon_category: string | null;
+}
+
+interface BookedVenue {
+  price_snapshot: number;
+  venue_price_list: { venue_name: string; category: string } | null;
 }
 
 interface Reservation {
@@ -39,6 +45,7 @@ interface Reservation {
   actioned_at: string | null;
   guests: { first_name: string; last_name: string; guest_type: string } | null;
   reservation_addons: Addon[];
+  reservation_venues: BookedVenue[];
 }
 
 interface GuestOption {
@@ -48,9 +55,22 @@ interface GuestOption {
   guest_type: string;
 }
 
+interface VenueOption {
+  venue_id: number;
+  venue_name: string;
+  category: string;
+  price_per_night: number;
+}
+
+interface SelectedVenue {
+  venue_id: number;
+  price_snapshot: number;
+}
+
 interface Props {
   reservations: Reservation[];
   guests: GuestOption[];
+  venues: VenueOption[];
 }
 
 /* ─── Helpers ────────────────────────────────────────────────────────── */
@@ -173,9 +193,9 @@ function generateOrderId(existing: Reservation[]): string {
   const next = String(maxSeq + 1).padStart(4, "0");
   const now = new Date();
   const dd = String(now.getDate()).padStart(2, "0");
-  const m = String(now.getMonth() + 1); // no leading zero
+  const mo = String(now.getMonth() + 1);
   const yy = String(now.getFullYear()).slice(-2);
-  return `RSV-${next}${dd}${m}${yy}`;
+  return `RSV-${next}${dd}${mo}${yy}`;
 }
 
 /* ─── Initial form state ─────────────────────────────────────────────── */
@@ -189,7 +209,6 @@ const BLANK_FORM = {
   check_out_time: "12:00",
   adult_count: "1",
   children_count: "0",
-  total_price: "",
   payment_status: "Pending",
   approval_status: "Pending",
   booking_source: "Website",
@@ -198,20 +217,25 @@ const BLANK_FORM = {
 
 /* ─── Main component ─────────────────────────────────────────────────── */
 
-export default function ReservationApproval({ reservations, guests }: Props) {
+export default function ReservationApproval({ reservations, guests, venues }: Props) {
   const router = useRouter();
   const [, startTransition] = useTransition();
 
   const [search, setSearch] = useState("");
+  const [refreshing, setRefreshing] = useState(false);
   const [showModal, setShowModal] = useState(false);
   const [actionId, setActionId] = useState<number | null>(null);
   const [form, setForm] = useState(BLANK_FORM);
   const [addons, setAddons] = useState<{ addon_name: string; addon_category: string }[]>([]);
+  const [selectedVenues, setSelectedVenues] = useState<SelectedVenue[]>([]);
   const [formError, setFormError] = useState("");
   const [submitting, setSubmitting] = useState(false);
 
-  /* Stat counts */
-  const pendingCount = reservations.filter((r) => r.approval_status === "Pending").length;
+  /* Today's date in YYYY-MM-DD for date input min attributes */
+  const today = new Date().toISOString().slice(0, 10);
+
+  /* Stat counts — all from the pending-only prop */
+  const pendingCount = reservations.length;
   const fullyPaidCount = reservations.filter((r) => r.payment_status === "Fully Paid").length;
   const partialCount = reservations.filter((r) => r.payment_status === "Partially Paid").length;
 
@@ -230,6 +254,25 @@ export default function ReservationApproval({ reservations, guests }: Props) {
     );
   }, [reservations, search]);
 
+  /* Venues grouped by category for <optgroup> */
+  const venuesByCategory = useMemo(() => {
+    const map: Record<string, VenueOption[]> = {};
+    for (const v of venues) {
+      if (!map[v.category]) map[v.category] = [];
+      map[v.category].push(v);
+    }
+    return Object.entries(map).sort(([a], [b]) => a.localeCompare(b));
+  }, [venues]);
+
+  /* IDs already picked (to prevent duplicates) */
+  const usedVenueIds = useMemo(
+    () => new Set(selectedVenues.map((v) => v.venue_id).filter((id) => id > 0)),
+    [selectedVenues],
+  );
+
+  /* Auto-computed total */
+  const totalPrice = selectedVenues.reduce((s, v) => s + v.price_snapshot, 0);
+
   /* Approve / Reject */
   async function handleAction(id: number, status: "Approved" | "Rejected") {
     setActionId(id);
@@ -246,7 +289,25 @@ export default function ReservationApproval({ reservations, guests }: Props) {
   /* Form helpers */
   const setField = (k: string, v: string) => setForm((p) => ({ ...p, [k]: v }));
 
-  /* Add-ons */
+  /* Venue helpers */
+  const addVenueRow = () =>
+    setSelectedVenues((p) => [...p, { venue_id: 0, price_snapshot: 0 }]);
+
+  const updateVenueRow = (i: number, venueId: number) => {
+    const found = venues.find((v) => v.venue_id === venueId);
+    setSelectedVenues((p) =>
+      p.map((row, idx) =>
+        idx === i
+          ? { venue_id: venueId, price_snapshot: found?.price_per_night ?? 0 }
+          : row,
+      ),
+    );
+  };
+
+  const removeVenueRow = (i: number) =>
+    setSelectedVenues((p) => p.filter((_, idx) => idx !== i));
+
+  /* Add-on helpers */
   const addAddon = () =>
     setAddons((p) => [...p, { addon_name: "", addon_category: "" }]);
   const updateAddon = (
@@ -262,10 +323,18 @@ export default function ReservationApproval({ reservations, guests }: Props) {
     e.preventDefault();
     setFormError("");
 
-    if (!form.guest_id) return setFormError("Please select a guest.");
+    const guestId = parseInt(form.guest_id, 10);
+    if (!guestId || guestId <= 0) return setFormError("Please select a guest.");
     if (!form.check_in_date || !form.check_out_date)
       return setFormError("Check-in and check-out dates are required.");
-    if (!form.total_price) return setFormError("Total price is required.");
+    if (form.check_in_date < today)
+      return setFormError("Check-in date cannot be in the past.");
+    if (form.check_out_date <= form.check_in_date)
+      return setFormError("Check-out date must be after the check-in date.");
+    if (selectedVenues.length === 0)
+      return setFormError("Please add at least one venue.");
+    if (selectedVenues.some((v) => v.venue_id === 0))
+      return setFormError("Please select a venue for every row.");
 
     setSubmitting(true);
 
@@ -280,23 +349,25 @@ export default function ReservationApproval({ reservations, guests }: Props) {
       await addReservation(
         {
           order_id: form.order_id.trim(),
-          guest_id: Number(form.guest_id),
+          guest_id: guestId,
           check_in_date: form.check_in_date,
           check_in_time: form.check_in_time,
           check_out_date: form.check_out_date,
           check_out_time: form.check_out_time,
           adult_count: Number(form.adult_count),
           children_count: Number(form.children_count),
-          total_price: Number(form.total_price),
+          total_price: totalPrice,
           payment_status: form.payment_status,
           approval_status: form.approval_status,
           booking_source: form.booking_source,
           special_notes: form.special_notes.trim() || null,
         },
         validAddons,
+        selectedVenues,
       );
       setForm(BLANK_FORM);
       setAddons([]);
+      setSelectedVenues([]);
       setShowModal(false);
       startTransition(() => router.refresh());
     } catch (err) {
@@ -310,6 +381,7 @@ export default function ReservationApproval({ reservations, guests }: Props) {
     setShowModal(false);
     setForm(BLANK_FORM);
     setAddons([]);
+    setSelectedVenues([]);
     setFormError("");
   }
 
@@ -329,21 +401,21 @@ export default function ReservationApproval({ reservations, guests }: Props) {
         <StatCard
           icon={<ClockHistory size={22} />}
           count={pendingCount}
-          label="Pending Reservations"
+          label="Awaiting Approval"
           from="#D4860A"
           to="#A86300"
         />
         <StatCard
           icon={<CheckCircleFill size={22} />}
           count={fullyPaidCount}
-          label="Fully Paid Reservations"
+          label="Fully Paid · Pending"
           from="#2E5A28"
           to="#1C3A18"
         />
         <StatCard
           icon={<HourglassSplit size={22} />}
           count={partialCount}
-          label="Partially Paid Reservations"
+          label="Partially Paid · Pending"
           from="#2C2C2C"
           to="#141414"
         />
@@ -369,6 +441,24 @@ export default function ReservationApproval({ reservations, guests }: Props) {
           </div>
           <button
             type="button"
+            disabled={refreshing}
+            onClick={async () => {
+              setRefreshing(true);
+              router.refresh();
+              await new Promise((r) => setTimeout(r, 600));
+              setRefreshing(false);
+            }}
+            className="flex h-9 w-9 items-center justify-center rounded-xl border border-border text-text-muted transition hover:border-[#9a9a9a] hover:text-text-on-light disabled:opacity-40"
+            aria-label="Refresh table"
+            title="Refresh"
+          >
+            <ArrowClockwise
+              size={14}
+              className={refreshing ? "animate-spin" : ""}
+            />
+          </button>
+          <button
+            type="button"
             onClick={() => {
               setForm((p) => ({ ...p, order_id: generateOrderId(reservations) }));
               setShowModal(true);
@@ -391,6 +481,7 @@ export default function ReservationApproval({ reservations, guests }: Props) {
                   "Guest Type",
                   "Dates Booked",
                   "Headcount",
+                  "Venues",
                   "Total Price",
                   "Payment Status",
                   "Requests",
@@ -400,7 +491,7 @@ export default function ReservationApproval({ reservations, guests }: Props) {
                     key={h}
                     className={`py-3.5 text-[10px] font-semibold uppercase tracking-[0.22em] text-white/60
                       ${i === 0 ? "pl-6 pr-4 text-left" : "px-4 text-left"}
-                      ${i === 8 ? "pr-6" : ""}
+                      ${i === 9 ? "pr-6" : ""}
                     `}
                   >
                     {h}
@@ -411,10 +502,10 @@ export default function ReservationApproval({ reservations, guests }: Props) {
             <tbody className="divide-y divide-border">
               {filtered.length === 0 ? (
                 <tr>
-                  <td colSpan={9} className="px-6 py-14 text-center text-sm text-text-muted">
+                  <td colSpan={10} className="px-6 py-14 text-center text-sm text-text-muted">
                     {search
                       ? "No reservations match your search."
-                      : "No reservations found."}
+                      : "No pending reservations. All reservations have been processed."}
                   </td>
                 </tr>
               ) : (
@@ -475,6 +566,26 @@ export default function ReservationApproval({ reservations, guests }: Props) {
                         </div>
                       </td>
 
+                      {/* Venues */}
+                      <td className="px-4 py-4">
+                        {res.reservation_venues?.length > 0 ? (
+                          <div className="space-y-1">
+                            {res.reservation_venues.map((rv, i) => (
+                              <div key={i} className="flex items-center gap-1.5">
+                                <span className="text-xs text-text-on-light leading-snug">
+                                  {rv.venue_price_list?.venue_name ?? "—"}
+                                </span>
+                                <span className="shrink-0 rounded-full bg-shell px-1.5 py-0.5 text-[9px] text-text-muted">
+                                  {rv.venue_price_list?.category}
+                                </span>
+                              </div>
+                            ))}
+                          </div>
+                        ) : (
+                          <span className="text-xs text-text-muted">—</span>
+                        )}
+                      </td>
+
                       {/* Total Price */}
                       <td className="px-4 py-4">
                         <span className="text-sm font-semibold tabular-nums">
@@ -513,43 +624,24 @@ export default function ReservationApproval({ reservations, guests }: Props) {
 
                       {/* Actions */}
                       <td className="py-4 pl-4 pr-6">
-                        {res.approval_status === "Pending" ? (
-                          <div className="flex flex-col gap-1.5">
-                            <button
-                              type="button"
-                              disabled={loading}
-                              onClick={() => handleAction(res.reservation_id, "Approved")}
-                              className="rounded-lg bg-topbar px-3 py-1.5 text-[10px] font-bold uppercase tracking-[0.22em] text-white transition hover:opacity-75 disabled:opacity-30"
-                            >
-                              {loading ? "·····" : "Approve"}
-                            </button>
-                            <button
-                              type="button"
-                              disabled={loading}
-                              onClick={() => handleAction(res.reservation_id, "Rejected")}
-                              className="rounded-lg bg-accent-red px-3 py-1.5 text-[10px] font-bold uppercase tracking-[0.22em] text-white transition hover:opacity-75 disabled:opacity-30"
-                            >
-                              {loading ? "·····" : "Reject"}
-                            </button>
-                          </div>
-                        ) : (
-                          <div className="min-w-[80px]">
-                            <div
-                              className={`rounded-lg px-3 py-1.5 text-center text-[10px] font-bold uppercase tracking-[0.22em] text-white ${
-                                res.approval_status === "Approved"
-                                  ? "bg-accent-green"
-                                  : "bg-accent-red"
-                              }`}
-                            >
-                              {res.approval_status}
-                            </div>
-                            {res.actioned_at && (
-                              <div className="mt-1.5 text-center text-[9px] leading-snug text-text-muted tabular-nums">
-                                {fmt_datetime(res.actioned_at)}
-                              </div>
-                            )}
-                          </div>
-                        )}
+                        <div className="flex flex-col gap-1.5">
+                          <button
+                            type="button"
+                            disabled={loading}
+                            onClick={() => handleAction(res.reservation_id, "Approved")}
+                            className="rounded-lg bg-topbar px-3 py-1.5 text-[10px] font-bold uppercase tracking-[0.22em] text-white transition hover:opacity-75 disabled:opacity-30"
+                          >
+                            {loading ? "·····" : "Approve"}
+                          </button>
+                          <button
+                            type="button"
+                            disabled={loading}
+                            onClick={() => handleAction(res.reservation_id, "Rejected")}
+                            className="rounded-lg bg-accent-red px-3 py-1.5 text-[10px] font-bold uppercase tracking-[0.22em] text-white transition hover:opacity-75 disabled:opacity-30"
+                          >
+                            {loading ? "·····" : "Reject"}
+                          </button>
+                        </div>
                       </td>
                     </tr>
                   );
@@ -647,8 +739,15 @@ export default function ReservationApproval({ reservations, guests }: Props) {
                       <input
                         required
                         type="date"
+                        min={today}
                         value={form.check_in_date}
-                        onChange={(e) => setField("check_in_date", e.target.value)}
+                        onChange={(e) => {
+                          const val = e.target.value;
+                          setField("check_in_date", val);
+                          if (form.check_out_date && form.check_out_date <= val) {
+                            setField("check_out_date", "");
+                          }
+                        }}
                         className={inputClass}
                       />
                     </div>
@@ -667,6 +766,7 @@ export default function ReservationApproval({ reservations, guests }: Props) {
                       <input
                         required
                         type="date"
+                        min={form.check_in_date ? form.check_in_date : today}
                         value={form.check_out_date}
                         onChange={(e) => setField("check_out_date", e.target.value)}
                         className={inputClass}
@@ -716,37 +816,109 @@ export default function ReservationApproval({ reservations, guests }: Props) {
                   </div>
                 </fieldset>
 
+                {/* Venues & Pricing */}
+                <fieldset>
+                  <div className="mb-3 flex items-center justify-between">
+                    <legend className="text-[10px] font-bold uppercase tracking-[0.28em] text-text-muted">
+                      Venues & Pricing
+                    </legend>
+                    <button
+                      type="button"
+                      onClick={addVenueRow}
+                      className="flex items-center gap-1.5 rounded-lg border border-border px-2.5 py-1 text-[11px] font-medium text-text-muted transition hover:border-[#9a9a9a] hover:text-text-on-light"
+                    >
+                      <PlusLg size={9} />
+                      Add venue
+                    </button>
+                  </div>
+
+                  {selectedVenues.length === 0 ? (
+                    <p className="text-xs text-text-muted">
+                      No venues added yet. Click &quot;Add venue&quot; to begin.
+                    </p>
+                  ) : (
+                    <div className="space-y-2">
+                      {selectedVenues.map((row, i) => {
+                        const venueInfo = venues.find((v) => v.venue_id === row.venue_id);
+                        return (
+                          <div key={i} className="flex items-center gap-2">
+                            {/* Venue dropdown */}
+                            <select
+                              value={row.venue_id === 0 ? "" : row.venue_id}
+                              onChange={(e) => updateVenueRow(i, Number(e.target.value))}
+                              className="h-10 flex-1 rounded-xl border border-border bg-shell px-3 text-sm text-text-on-light focus:border-[#9a9a9a] focus:outline-none transition appearance-none"
+                            >
+                              <option value="">Select a venue...</option>
+                              {venuesByCategory.map(([cat, catVenues]) => (
+                                <optgroup key={cat} label={cat}>
+                                  {catVenues.map((v) => (
+                                    <option
+                                      key={v.venue_id}
+                                      value={v.venue_id}
+                                      disabled={
+                                        usedVenueIds.has(v.venue_id) &&
+                                        v.venue_id !== row.venue_id
+                                      }
+                                    >
+                                      {v.venue_name}
+                                    </option>
+                                  ))}
+                                </optgroup>
+                              ))}
+                            </select>
+
+                            {/* Price display */}
+                            <div className="flex h-10 w-36 shrink-0 items-center justify-end rounded-xl border border-border bg-shell/50 px-3 text-sm font-semibold tabular-nums text-text-on-light">
+                              {row.venue_id > 0 ? PHP(row.price_snapshot) : "₱ —"}
+                            </div>
+
+                            {/* Remove */}
+                            <button
+                              type="button"
+                              onClick={() => removeVenueRow(i)}
+                              className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border border-border text-text-muted transition hover:border-accent-red hover:text-accent-red"
+                              aria-label="Remove venue"
+                            >
+                              <Trash3 size={12} />
+                            </button>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  )}
+
+                  {/* Total price summary */}
+                  {selectedVenues.length > 0 && (
+                    <div className="mt-3 flex items-center justify-between rounded-xl border border-border bg-shell/60 px-4 py-3">
+                      <div className="text-xs font-medium text-text-muted">
+                        Total · {selectedVenues.filter((v) => v.venue_id > 0).length}{" "}
+                        {selectedVenues.filter((v) => v.venue_id > 0).length === 1
+                          ? "venue"
+                          : "venues"}
+                      </div>
+                      <div className="text-base font-bold tabular-nums text-text-on-light">
+                        {PHP(totalPrice)}
+                      </div>
+                    </div>
+                  )}
+                </fieldset>
+
                 {/* Financial */}
                 <fieldset>
                   <legend className="mb-3 text-[10px] font-bold uppercase tracking-[0.28em] text-text-muted">
                     Financial
                   </legend>
-                  <div className="grid gap-4 sm:grid-cols-2">
-                    <div>
-                      <FieldLabel>Total Price (₱)</FieldLabel>
-                      <input
-                        required
-                        type="number"
-                        min="0"
-                        step="0.01"
-                        value={form.total_price}
-                        onChange={(e) => setField("total_price", e.target.value)}
-                        placeholder="0.00"
-                        className={inputClass}
-                      />
-                    </div>
-                    <div>
-                      <FieldLabel>Payment Status</FieldLabel>
-                      <select
-                        value={form.payment_status}
-                        onChange={(e) => setField("payment_status", e.target.value)}
-                        className={selectClass}
-                      >
-                        <option>Pending</option>
-                        <option>Partially Paid</option>
-                        <option>Fully Paid</option>
-                      </select>
-                    </div>
+                  <div>
+                    <FieldLabel>Payment Status</FieldLabel>
+                    <select
+                      value={form.payment_status}
+                      onChange={(e) => setField("payment_status", e.target.value)}
+                      className={selectClass}
+                    >
+                      <option>Pending</option>
+                      <option>Partially Paid</option>
+                      <option>Fully Paid</option>
+                    </select>
                   </div>
                 </fieldset>
 

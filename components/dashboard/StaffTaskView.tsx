@@ -2,45 +2,37 @@
 
 import { useState } from "react";
 import { PencilFill, XLg } from "react-bootstrap-icons";
-import { STAFF, type StaffMember } from "@/lib/data/staff";
 import { ALL_AREA_NAMES } from "@/lib/data/venueAreas";
-import { useStaffAssignments } from "@/components/providers/StaffAssignmentProvider";
+import { useStaffAssignments, type DbStaff } from "@/components/providers/StaffAssignmentProvider";
 
-// ─── Local class maps (must live in a scanned file) ────────────────────────
+// ─── Color palette (cycles by index) ────────────────────────────────────────
 
-const AVATAR_CLS: Record<string, string> = {
+const COLORS = ["blue", "green", "orange"] as const;
+type Color = (typeof COLORS)[number];
+
+const AVATAR_CLS: Record<Color, string> = {
   blue:   "bg-accent-blue/25 text-accent-blue",
   green:  "bg-accent-green/25 text-accent-green",
   orange: "bg-accent-orange/20 text-accent-orange",
 };
 
-const TAG_CLS: Record<string, string> = {
+const TAG_CLS: Record<Color, string> = {
   blue:   "bg-accent-blue/15 text-accent-blue",
   green:  "bg-accent-green/15 text-accent-green",
   orange: "bg-accent-orange/15 text-accent-orange",
-};
-
-const STATUS_DOT: Record<string, string> = {
-  "On Duty":    "bg-accent-green",
-  "On Standby": "bg-accent-orange",
-  "Off Duty":   "bg-white/30",
-};
-
-const STATUS_LABEL: Record<string, string> = {
-  "On Duty":    "text-accent-green",
-  "On Standby": "text-accent-orange",
-  "Off Duty":   "text-white/40",
 };
 
 // ─── Edit modal ─────────────────────────────────────────────────────────────
 
 function EditModal({
   member,
+  color,
   currentAreas,
   onSave,
   onCancel,
 }: {
-  member: StaffMember;
+  member: DbStaff;
+  color: Color;
   currentAreas: string[];
   onSave: (areas: string[]) => void;
   onCancel: () => void;
@@ -58,7 +50,7 @@ function EditModal({
         {/* Modal header */}
         <div className="flex items-start justify-between border-b border-white/[0.06] px-6 py-5">
           <div>
-            <div className="font-bold text-white">{member.name}</div>
+            <div className="font-bold text-white">{member.staff_name}</div>
             <div className="mt-0.5 text-xs text-white/40">{member.role} · Edit assigned areas</div>
           </div>
           <button
@@ -87,7 +79,7 @@ function EditModal({
                 {draft.map((area) => (
                   <span
                     key={area}
-                    className={`flex items-center gap-1.5 rounded-full px-3 py-1 text-xs font-medium ${TAG_CLS[member.color]}`}
+                    className={`flex items-center gap-1.5 rounded-full px-3 py-1 text-xs font-medium ${TAG_CLS[color]}`}
                   >
                     {area}
                     <button
@@ -154,16 +146,17 @@ function EditModal({
 // ─── Main component ──────────────────────────────────────────────────────────
 
 export default function StaffTaskView() {
-  const { assignments, updateStaffAreas } = useStaffAssignments();
-  const [editingMember, setEditingMember] = useState<StaffMember | null>(null);
+  const { dbStaff, assignments, updateStaffAreas } = useStaffAssignments();
+  const [editing, setEditing] = useState<{ member: DbStaff; color: Color } | null>(null);
 
-  const onDutyCount  = STAFF.filter((s) => s.status === "On Duty").length;
-  const standbyCount = STAFF.filter((s) => s.status === "On Standby").length;
-  const totalAreas   = STAFF.reduce((sum, s) => sum + (assignments[s.id]?.length ?? 0), 0);
+  const totalAreas = dbStaff.reduce(
+    (sum, s) => sum + (assignments[String(s.staff_id)]?.length ?? 0),
+    0,
+  );
 
   const handleSave = (areas: string[]) => {
-    if (editingMember) updateStaffAreas(editingMember.id, areas);
-    setEditingMember(null);
+    if (editing) updateStaffAreas(String(editing.member.staff_id), areas);
+    setEditing(null);
   };
 
   return (
@@ -178,31 +171,17 @@ export default function StaffTaskView() {
               Grand Mansion Venue · Today&apos;s assignment overview
             </p>
           </div>
-          <div className="flex items-center gap-3">
-            <div className="flex items-center gap-1.5 rounded-full border border-accent-green/30 bg-accent-green/10 px-3 py-1">
-              <span className="h-1.5 w-1.5 rounded-full bg-accent-green" />
-              <span className="text-[11px] font-semibold text-accent-green">{onDutyCount} On Duty</span>
-            </div>
-            {standbyCount > 0 && (
-              <div className="flex items-center gap-1.5 rounded-full border border-accent-orange/30 bg-accent-orange/10 px-3 py-1">
-                <span className="h-1.5 w-1.5 rounded-full bg-accent-orange" />
-                <span className="text-[11px] font-semibold text-accent-orange">{standbyCount} Standby</span>
-              </div>
-            )}
-          </div>
         </div>
 
         {/* Stats row */}
-        <div className="grid grid-cols-4 border-t border-border">
+        <div className="grid grid-cols-2 border-t border-border">
           {[
-            { value: STAFF.length, label: "Total Staff" },
-            { value: onDutyCount,  label: "On Duty" },
-            { value: standbyCount, label: "On Standby" },
-            { value: totalAreas,   label: "Areas Covered" },
+            { value: dbStaff.length, label: "Total Staff" },
+            { value: totalAreas,     label: "Areas Covered" },
           ].map(({ value, label }, i) => (
             <div
               key={label}
-              className={`flex flex-col items-center justify-center py-3 ${i < 3 ? "border-r border-border" : ""}`}
+              className={`flex flex-col items-center justify-center py-3 ${i < 1 ? "border-r border-border" : ""}`}
             >
               <div className="text-xl font-extrabold tabular-nums text-text-on-light">{value}</div>
               <div className="text-[10px] text-text-muted">{label}</div>
@@ -212,92 +191,95 @@ export default function StaffTaskView() {
       </div>
 
       {/* ── Staff Grid ─────────────────────────────────────────── */}
-      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
-        {STAFF.map((member) => {
-          const memberAreas = assignments[member.id] ?? [];
+      {dbStaff.length === 0 ? (
+        <div className="rounded-3xl border border-border bg-card-light p-12 text-center text-sm text-text-muted">
+          Loading staff...
+        </div>
+      ) : (
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+          {dbStaff.map((member, index) => {
+            const color = COLORS[index % COLORS.length];
+            const memberAreas = assignments[String(member.staff_id)] ?? [];
 
-          return (
-            <div
-              key={member.id}
-              className="flex flex-col rounded-3xl border border-white/[0.07] bg-card-dark shadow-md"
-            >
-              {/* Card top */}
-              <div className="flex items-start justify-between gap-3 px-5 pt-5 pb-4">
-                <div className="flex min-w-0 items-start gap-4">
-                  <div
-                    className={`flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl text-lg font-extrabold ${AVATAR_CLS[member.color]}`}
-                  >
-                    {member.name.charAt(0)}
-                  </div>
-                  <div className="min-w-0">
-                    <div className="font-bold text-sm leading-tight text-white">{member.name}</div>
-                    <div className="mt-0.5 text-[11px] text-white/50">{member.role}</div>
-                    <div className="mt-2 flex items-center gap-1.5">
-                      <span className={`h-1.5 w-1.5 rounded-full ${STATUS_DOT[member.status]}`} />
-                      <span className={`text-[10px] font-semibold ${STATUS_LABEL[member.status]}`}>
-                        {member.status}
-                      </span>
-                      <span className="text-white/20">·</span>
-                      <span className="text-[10px] text-white/40">{member.shift}</span>
+            return (
+              <div
+                key={member.staff_id}
+                className="flex flex-col rounded-3xl border border-white/[0.07] bg-card-dark shadow-md"
+              >
+                {/* Card top */}
+                <div className="flex items-start justify-between gap-3 px-5 pt-5 pb-4">
+                  <div className="flex min-w-0 items-start gap-4">
+                    <div
+                      className={`flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl text-lg font-extrabold ${AVATAR_CLS[color]}`}
+                    >
+                      {member.staff_name.charAt(0)}
+                    </div>
+                    <div className="min-w-0">
+                      <div className="font-bold text-sm leading-tight text-white">{member.staff_name}</div>
+                      <div className="mt-0.5 text-[11px] text-white/50">{member.role}</div>
+                      {member.contact_number && (
+                        <div className="mt-1 text-[10px] text-white/30">{member.contact_number}</div>
+                      )}
                     </div>
                   </div>
+                  <button
+                    type="button"
+                    onClick={() => setEditing({ member, color })}
+                    className="shrink-0 rounded-full p-1.5 text-white/25 transition-all hover:bg-white/[0.08] hover:text-white/60"
+                    aria-label={`Edit ${member.staff_name}'s areas`}
+                  >
+                    <PencilFill size={11} />
+                  </button>
                 </div>
-                <button
-                  type="button"
-                  onClick={() => setEditingMember(member)}
-                  className="shrink-0 rounded-full p-1.5 text-white/25 transition-all hover:bg-white/[0.08] hover:text-white/60"
-                  aria-label={`Edit ${member.name}'s areas`}
-                >
-                  <PencilFill size={11} />
-                </button>
-              </div>
 
-              {/* Divider */}
-              <div className="mx-5 h-px bg-white/[0.07]" />
+                {/* Divider */}
+                <div className="mx-5 h-px bg-white/[0.07]" />
 
-              {/* Areas */}
-              <div className="flex-1 px-5 py-4">
-                <div className="mb-3 flex items-center gap-2">
-                  <div className="h-3 w-[3px] rounded-full bg-white/30" />
-                  <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-white/40">
-                    Assigned Areas
+                {/* Areas */}
+                <div className="flex-1 px-5 py-4">
+                  <div className="mb-3 flex items-center gap-2">
+                    <div className="h-3 w-[3px] rounded-full bg-white/30" />
+                    <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-white/40">
+                      Assigned Areas
+                    </span>
+                  </div>
+                  {memberAreas.length === 0 ? (
+                    <p className="text-xs italic text-white/20">No areas assigned</p>
+                  ) : (
+                    <div className="flex flex-wrap gap-1.5">
+                      {memberAreas.map((area) => (
+                        <span
+                          key={area}
+                          className={`rounded-lg px-2 py-0.5 text-[10px] font-medium ${TAG_CLS[color]}`}
+                        >
+                          {area}
+                        </span>
+                      ))}
+                    </div>
+                  )}
+                </div>
+
+                {/* Footer */}
+                <div className="flex items-center justify-between border-t border-white/[0.07] px-5 py-3">
+                  <span className="text-[10px] text-white/25">ID #{member.staff_id}</span>
+                  <span className="text-[10px] font-semibold text-white/40">
+                    {memberAreas.length} {memberAreas.length === 1 ? "area" : "areas"}
                   </span>
                 </div>
-                {memberAreas.length === 0 ? (
-                  <p className="text-xs italic text-white/20">No areas assigned</p>
-                ) : (
-                  <div className="flex flex-wrap gap-1.5">
-                    {memberAreas.map((area) => (
-                      <span
-                        key={area}
-                        className={`rounded-lg px-2 py-0.5 text-[10px] font-medium ${TAG_CLS[member.color]}`}
-                      >
-                        {area}
-                      </span>
-                    ))}
-                  </div>
-                )}
               </div>
-
-              {/* Footer */}
-              <div className="flex items-center justify-between border-t border-white/[0.07] px-5 py-3">
-                <span className="text-[10px] text-white/25">{member.id}</span>
-                <span className="text-[10px] font-semibold text-white/40">
-                  {memberAreas.length} {memberAreas.length === 1 ? "area" : "areas"}
-                </span>
-              </div>
-            </div>
-          );
-        })}
-      </div>
+            );
+          })}
+        </div>
+      )}
 
       {/* ── Edit modal ─────────────────────────────────────────── */}
-      {editingMember && (
+      {editing && (
         <EditModal
-          member={editingMember}
-          currentAreas={assignments[editingMember.id] ?? []}
+          member={editing.member}
+          color={editing.color}
+          currentAreas={assignments[String(editing.member.staff_id)] ?? []}
           onSave={handleSave}
-          onCancel={() => setEditingMember(null)}
+          onCancel={() => setEditing(null)}
         />
       )}
     </div>

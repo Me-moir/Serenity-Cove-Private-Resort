@@ -94,7 +94,7 @@ export default function SidebarIconRail({
     ? "DashboardSettings"
     : "HomeDashboard";
   const activeIndex = topTabs.findIndex((tab) => tab.id === activeTab);
-  const railStep = 44;
+  const railStep = 52;
 
   useEffect(() => {
     [...topTabs, ...bottomTabs].forEach((tab) => {
@@ -118,7 +118,7 @@ export default function SidebarIconRail({
             />
           </div>
           <div className="my-2 h-px w-9 bg-border" />
-          <div className="relative flex flex-col items-center gap-2">
+          <div className="relative flex flex-col items-center gap-4">
             {activeIndex >= 0 ? (
               <span
                 className="pointer-events-none absolute left-0 right-0 h-9 rounded-md bg-topbar transition-transform duration-200 ease-out"
@@ -163,7 +163,7 @@ export default function SidebarIconRail({
           </div>
         </div>
 
-        <div className="flex flex-col items-center gap-2 rounded-3xl bg-surface-soft p-2 shadow-[0_10px_30px_rgba(0,0,0,0.08)]">
+        <div className="flex flex-col items-center gap-4 rounded-3xl bg-surface-soft p-2 shadow-[0_10px_30px_rgba(0,0,0,0.08)]">
           {bottomTabs.map((tab) => {
             const Icon = tab.icon;
             const isActive = activeTab === tab.id;

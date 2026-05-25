@@ -3,6 +3,7 @@
 import { useMemo, useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import {
+  ArrowClockwise,
   ChevronLeft,
   ChevronRight,
   EnvelopeFill,
@@ -182,6 +183,7 @@ export default function GuestRecords({ guests }: Props) {
   const [filterType, setFilterType] = useState("All");
   const [showFilter, setShowFilter] = useState(false);
   const [page, setPage] = useState(1);
+  const [refreshing, setRefreshing] = useState(false);
 
   /* Modal state */
   const [showAdd, setShowAdd] = useState(false);
@@ -403,6 +405,20 @@ export default function GuestRecords({ guests }: Props) {
             aria-label="Add guest"
           >
             <PlusLg size={14} />
+          </button>
+
+          {/* Refresh */}
+          <button
+            type="button"
+            onClick={() => {
+              setRefreshing(true);
+              startTransition(() => router.refresh());
+              setTimeout(() => setRefreshing(false), 600);
+            }}
+            className="flex h-9 w-9 items-center justify-center rounded-xl border border-border text-text-muted transition hover:border-topbar hover:bg-topbar hover:text-white"
+            aria-label="Refresh"
+          >
+            <ArrowClockwise size={14} className={refreshing ? "animate-spin" : ""} />
           </button>
 
           {/* Pagination (right-aligned) */}
@@ -762,21 +778,28 @@ export default function GuestRecords({ guests }: Props) {
                   <div className="grid gap-4 sm:grid-cols-2">
                     <div>
                       <FL>Phone Number</FL>
-                      <input
-                        type="tel"
-                        value={form.contact_number}
-                        onChange={(e) => handlePhoneChange(e.target.value)}
-                        placeholder="10-digit number"
-                        maxLength={10}
-                        className={phoneError ? inputErrCls : inputCls}
-                      />
+                      <div className={`flex h-10 overflow-hidden rounded-xl border bg-shell transition ${
+                        phoneError ? "border-accent-red" : "border-border focus-within:border-[#9a9a9a]"
+                      }`}>
+                        <span className="flex items-center border-r border-border bg-shell px-3 text-sm font-semibold text-text-muted select-none">
+                          +63
+                        </span>
+                        <input
+                          type="tel"
+                          value={form.contact_number}
+                          onChange={(e) => handlePhoneChange(e.target.value)}
+                          placeholder="9XXXXXXXXX"
+                          maxLength={10}
+                          className="flex-1 bg-transparent px-3 text-sm text-text-on-light placeholder:text-text-muted/50 focus:outline-none"
+                        />
+                      </div>
                       {phoneError ? (
                         <p className="mt-1 text-[10px] text-accent-red">
                           Must be exactly 10 digits.
                         </p>
                       ) : (
                         <p className="mt-1 text-[10px] text-text-muted">
-                          Digits only · exactly 10 characters
+                          Enter the 10-digit number after +63
                         </p>
                       )}
                     </div>

@@ -6,12 +6,23 @@ export const dynamic = "force-dynamic";
 export default async function ReservationRecordsPage() {
   const sb = createSupabaseServiceClient();
 
-  const { data: reservations } = await sb
-    .from("reservations")
-    .select("*, guests(first_name, last_name, guest_type)")
-    .in("approval_status", ["Approved", "Rejected"])
-    .order("actioned_at", { ascending: false })
-    .order("created_at", { ascending: false });
+  const [reservationsResult, venuesResult] = await Promise.all([
+    sb
+      .from("reservations")
+      .select("*, guests(first_name, last_name, guest_type), reservation_venues(price_snapshot, venue_price_list(venue_name, category))")
+      .order("created_at", { ascending: false }),
+    sb
+      .from("venue_price_list")
+      .select("venue_id, venue_name, category, price_per_night")
+      .eq("is_active", true)
+      .order("category")
+      .order("venue_name"),
+  ]);
 
-  return <ReservationRecords reservations={reservations ?? []} />;
+  return (
+    <ReservationRecords
+      reservations={reservationsResult.data ?? []}
+      venues={venuesResult.data ?? []}
+    />
+  );
 }

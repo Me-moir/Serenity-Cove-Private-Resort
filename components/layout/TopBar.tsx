@@ -66,59 +66,54 @@ export default function TopBar({ onMenuClick }: TopBarProps) {
 
   return (
     <header className="w-full bg-topbar text-text-on-dark">
-      <div className="flex items-center justify-between px-3 py-3 sm:px-6 lg:px-8">
-        {/* mobile: hamburger */}
-        <div className="flex min-w-[2.75rem] items-center md:hidden">
-          <button
-            type="button"
-            onClick={onMenuClick}
-            className="rounded-full p-2"
-            aria-label="Open sidebar"
-          >
-            <List size={20} />
-          </button>
+      {/* Mobile row */}
+      <div className="flex items-center justify-between px-3 py-3 sm:px-6 md:hidden">
+        <button
+          type="button"
+          onClick={onMenuClick}
+          className="rounded-full p-2"
+          aria-label="Open sidebar"
+        >
+          <List size={20} />
+        </button>
+        <div className="text-center">
+          <div className="text-sm font-semibold">{dayName}</div>
+          <div className="text-[11px] text-text-on-dark/70">{dateLabel}</div>
+          <div className="text-[11px] text-text-on-dark/60">{timeLabel}</div>
         </div>
+        <button type="button" className="rounded-full p-2" aria-label="Alerts">
+          <Bell size={18} />
+        </button>
+      </div>
 
-        {/* mobile: date/time center */}
-        <div className="flex flex-1 items-center justify-center px-2 text-center md:hidden">
-          <div className="text-center">
-            <div className="text-sm font-semibold">{dayName}</div>
-            <div className="text-[11px] text-text-on-dark/70">{dateLabel}</div>
-            <div className="text-[11px] text-text-on-dark/60">{timeLabel}</div>
+      {/* Desktop row — equal-width columns */}
+      <div className="hidden w-full md:flex">
+        {/* Today */}
+        <div className="flex flex-1 flex-col items-center justify-center border-r border-white/[0.08] px-4 py-4">
+          <span className="text-[10px] uppercase tracking-[0.4em] text-text-on-dark/50">Today</span>
+        </div>
+        {/* Day + weather summary */}
+        <div className="flex flex-1 flex-col items-center justify-center border-r border-white/[0.08] px-4 py-4 text-center">
+          <div className="text-xl font-semibold leading-tight">{dayName}</div>
+          <div className="mt-1 flex items-center gap-1.5 text-[11px] text-accent-orange">
+            <ThermometerHigh size={11} />
+            <span className="line-clamp-1">{weatherSummary}</span>
           </div>
         </div>
-
-        {/* mobile: bell */}
-        <div className="flex min-w-[2.75rem] items-center justify-end md:hidden">
-          <button type="button" className="rounded-full p-2" aria-label="Alerts">
-            <Bell size={18} />
-          </button>
+        {/* Date + weather label */}
+        <div className="flex flex-1 flex-col items-center justify-center border-r border-white/[0.08] px-4 py-4 text-center">
+          <div className="text-base font-medium leading-tight">{dateLabel}</div>
+          <div className="mt-1 text-[11px] text-text-on-dark/60">{weatherLabel}</div>
         </div>
-
-        {/* desktop: full weather header */}
-        <div className="hidden w-full items-center gap-8 md:flex">
-          <div className="text-xs uppercase tracking-[0.4em] text-text-on-dark/70">
-            Today
-          </div>
-          <div>
-            <div className="text-2xl font-semibold">{dayName}</div>
-            <div className="mt-1 flex items-center gap-2 text-xs text-accent-orange">
-              <ThermometerHigh size={12} />
-              {weatherSummary}
-            </div>
-          </div>
-          <div>
-            <div className="text-lg font-medium">{dateLabel}</div>
-            <div className="text-xs text-text-on-dark/70">{weatherLabel}</div>
-          </div>
-          <div>
-            <div className="text-lg font-medium">{timeLabel}</div>
-            <div className="text-xs text-text-on-dark/70">{temperatureLabel}</div>
-          </div>
-          <div className="hidden lg:block">
-            <div className="text-lg font-medium">{`${locationLabel} (${timezoneLabel})`}</div>
-            <div className="text-xs text-text-on-dark/70">{timezone}</div>
-          </div>
+        {/* Time + temperature */}
+        <div className="flex flex-1 flex-col items-center justify-center px-4 py-4 text-center lg:border-r lg:border-white/[0.08]">
+          <div className="text-base font-medium leading-tight">{timeLabel}</div>
+          <div className="mt-1 text-[11px] text-text-on-dark/60">{temperatureLabel}</div>
+        </div>
+        {/* Location + timezone — only on lg+ */}
+        <div className="hidden flex-1 flex-col items-center justify-center px-4 py-4 text-center lg:flex">
+          <div className="text-base font-medium leading-tight">{`${locationLabel} (${timezoneLabel})`}</div>
+          <div className="mt-1 text-[11px] text-text-on-dark/60">{timezone}</div>
         </div>
       </div>
     </header>

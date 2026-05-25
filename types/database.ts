@@ -154,6 +154,16 @@ export interface ReviewWithGuest extends Review {
   reservations: Pick<Reservation, "order_id"> | null;
 }
 
+export interface VenuePriceList {
+  venue_id: number;
+  venue_name: string;
+  category: string;
+  price_per_night: number;
+  description: string | null;
+  is_active: boolean;
+  created_at: string;
+}
+
 export interface GuestStats {
   total: number;
   new: number;

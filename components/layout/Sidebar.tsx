@@ -69,7 +69,9 @@ const recordsNavItems: SidebarNavItem[] = [
   { label: "Guest Records", href: "/dashboard/records/subtab-1", icon: PersonLinesFill },
   { label: "Reservation Records", href: "/dashboard/records/subtab-4", icon: FileEarmarkCheck },
   { label: "Financial Records", href: "/dashboard/records/subtab-2", icon: Receipt },
-  { label: "Incidents", href: "/dashboard/records/subtab-3", icon: ExclamationTriangle }
+  { label: "Incidents", href: "/dashboard/records/subtab-3", icon: ExclamationTriangle },
+  { label: "Staff Roster", href: "/dashboard/records/subtab-5", icon: People },
+  { label: "Venue Price List", href: "/dashboard/records/subtab-6", icon: Grid1x2 }
 ];
 
 const maintenanceNavItems: SidebarNavItem[] = [
