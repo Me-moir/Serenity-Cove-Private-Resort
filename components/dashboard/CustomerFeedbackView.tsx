@@ -41,20 +41,6 @@ const AVATAR_PALETTES = [
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 
-function StarRow({ rating, size = 11 }: { rating: number; size?: number }) {
-  return (
-    <div className="flex gap-0.5">
-      {Array.from({ length: 5 }, (_, i) =>
-        i < rating ? (
-          <StarFill key={i} size={size} className="text-accent-orange" />
-        ) : (
-          <Star key={i} size={size} className="text-white/20" />
-        )
-      )}
-    </div>
-  );
-}
-
 function StarRowLight({ rating, size = 11 }: { rating: number; size?: number }) {
   return (
     <div className="flex gap-0.5">
@@ -163,7 +149,7 @@ export default function CustomerFeedbackView({ reviews }: { reviews: ReviewWithG
 
       {/* ── Page Header ─────────────────────────────────────────────────────── */}
       <div className="overflow-hidden rounded-3xl border border-white/[0.06] bg-[#111114]">
-        <div className="flex items-center justify-between px-6 py-5">
+        <div className="flex flex-wrap items-start justify-between gap-3 px-4 py-4 sm:px-6 sm:py-5">
           <div>
             <h1 className="text-lg font-bold text-white">Customer Feedback</h1>
             <p className="mt-0.5 text-xs text-white/40">
@@ -186,7 +172,7 @@ export default function CustomerFeedbackView({ reviews }: { reviews: ReviewWithG
           </div>
         </div>
 
-        <div className="grid grid-cols-4 border-t border-white/[0.06]">
+        <div className="grid grid-cols-2 sm:grid-cols-4 border-t border-white/[0.06]">
           {[
             { value: reviews.length,         label: "Total Reviews" },
             { value: thisMonth.length,        label: "This Month" },
@@ -195,7 +181,7 @@ export default function CustomerFeedbackView({ reviews }: { reviews: ReviewWithG
           ].map(({ value, label }, i) => (
             <div
               key={label}
-              className={`flex flex-col items-center justify-center py-3 ${i < 3 ? "border-r border-white/[0.06]" : ""}`}
+              className={`flex flex-col items-center justify-center py-3 ${i !== 1 && i !== 3 ? "border-r border-white/[0.06]" : ""} ${i === 1 ? "sm:border-r sm:border-white/[0.06]" : ""} ${i >= 2 ? "border-t border-white/[0.06] sm:border-t-0" : ""}`}
             >
               <div className="text-xl font-extrabold tabular-nums text-white">{value}</div>
               <div className="text-[10px] text-white/30">{label}</div>
@@ -205,7 +191,7 @@ export default function CustomerFeedbackView({ reviews }: { reviews: ReviewWithG
       </div>
 
       {/* ── Two-column body ──────────────────────────────────────────────────── */}
-      <div className="flex items-stretch gap-4">
+      <div className="flex flex-col lg:flex-row items-stretch gap-4">
 
         {/* Left — Analytics ─────────────────────────────────────────────────── */}
         <div className="min-w-0 flex-[5] space-y-4">
