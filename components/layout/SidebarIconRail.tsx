@@ -3,12 +3,12 @@
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import type { MouseEvent } from "react";
 import {
   BarChart,
-  CalendarCheck,
   ClockHistory,
+  Tools,
   Flag,
   Gear,
   Grid1x2,
@@ -33,10 +33,10 @@ const topTabs = [
     label: "Records"
   },
   {
-    id: "CleaningSchedule",
+    id: "Maintenance",
     href: "/dashboard/cleaning/subtab-1",
-    icon: CalendarCheck,
-    label: "Cleaning"
+    icon: Tools,
+    label: "Maintenance"
   },
   {
     id: "ReportsAnalytics",
@@ -70,6 +70,14 @@ export default function SidebarIconRail({
   const { resolvedTheme, toggleTheme } = useTheme();
   const pathname = usePathname();
   const router = useRouter();
+  const [tooltip, setTooltip] = useState<{ label: string; x: number; y: number } | null>(null);
+
+  const showTooltip = (e: MouseEvent<HTMLAnchorElement>, label: string) => {
+    const rect = e.currentTarget.getBoundingClientRect();
+    setTooltip({ label, x: rect.right + 8, y: rect.top + rect.height / 2 });
+  };
+
+  const hideTooltip = () => setTooltip(null);
   const currentPathTab = pathname.startsWith("/dashboard/records")
     ? "RecordsManagement"
     : pathname.startsWith("/dashboard/cleaning")
@@ -95,6 +103,7 @@ export default function SidebarIconRail({
   }, [router]);
 
   return (
+    <>
     <aside className="sticky top-0 hidden h-dvh w-20 self-start overscroll-none bg-shell px-3 py-4 lg:flex lg:h-screen">
       <div className="flex h-full w-full flex-col justify-between rounded-3xl bg-rail px-2 py-4 shadow-sm">
         <div className="flex flex-col items-center rounded-3xl bg-surface-soft p-2 shadow-[0_10px_30px_rgba(0,0,0,0.08)]">
@@ -139,6 +148,8 @@ export default function SidebarIconRail({
                   href={destinationHref}
                   prefetch
                   onClick={handleTopTabClick}
+                  onMouseEnter={(e) => showTooltip(e, tab.label)}
+                  onMouseLeave={hideTooltip}
                   className={`relative z-10 flex h-9 w-9 items-center justify-center rounded-md border border-transparent ${
                     isActive ? "text-text-on-dark" : "text-text-on-light"
                   }`}
@@ -172,6 +183,8 @@ export default function SidebarIconRail({
                 href={destinationHref}
                 prefetch
                 onClick={handleBottomTabClick}
+                onMouseEnter={(e) => showTooltip(e, tab.label)}
+                onMouseLeave={hideTooltip}
                 className={`flex h-9 w-9 items-center justify-center rounded-full border border-transparent transition ${
                   isActive
                     ? "bg-topbar text-text-on-dark"
@@ -202,5 +215,15 @@ export default function SidebarIconRail({
         </div>
       </div>
     </aside>
+
+      {tooltip && (
+        <div
+          className="pointer-events-none fixed z-[9999] -translate-y-1/2 whitespace-nowrap rounded-lg bg-topbar px-2.5 py-1 text-xs font-medium text-text-on-dark shadow-lg"
+          style={{ left: tooltip.x, top: tooltip.y }}
+        >
+          {tooltip.label}
+        </div>
+      )}
+    </>
   );
 }

@@ -3,23 +3,23 @@
 @tailwind utilities;
 
 :root {
-  --color-shell: #F0F0F0;
+  --color-shell: #E9ECF2;
   --color-sidebar: #FFFFFF;
-  --color-rail: #F5F5F5;
+  --color-rail: #EFF2F6;
   --color-topbar: #1A1A1A;
   --color-card-dark: #1A1A1A;
   --color-card-light: #FFFFFF;
   --color-text-on-dark: #FFFFFF;
-  --color-text-on-light: #1A1A1A;
-  --color-text-muted: #6B6B6B;
-  --color-accent-orange: #F5A623;
-  --color-accent-red: #E53E3E;
-  --color-accent-green: #38A169;
-  --color-accent-blue: #3182CE;
-  --color-border: #E5E5E5;
-  --color-skeleton-highlight: #F5F5F5;
-  --color-slider-line: #7A8695;
-  --color-surface-soft: rgba(255, 255, 255, 0.72);
+  --color-text-on-light: #111827;
+  --color-text-muted: #64748B;
+  --color-accent-orange: #EA580C;
+  --color-accent-red: #DC2626;
+  --color-accent-green: #16A34A;
+  --color-accent-blue: #2563EB;
+  --color-border: #C9D2DA;
+  --color-skeleton-highlight: #EEF1F5;
+  --color-slider-line: #94A3B8;
+  --color-surface-soft: rgba(255, 255, 255, 0.82);
   --color-surface-soft-hover: #FFFFFF;
 }
 
@@ -44,30 +44,6 @@
   --color-surface-soft-hover: #2A2A2A;
 }
 
-@keyframes rainbow-border {
-  0%   { background-position: 0 0, 0% 50%; }
-  100% { background-position: 0 0, 200% 50%; }
-}
-
-.rainbow-search {
-  border-radius: 0.75rem;
-  border: 2px solid transparent;
-  background-image:
-    linear-gradient(var(--color-shell), var(--color-shell)),
-    linear-gradient(
-      90deg,
-      hsl(0,   100%, 63%),
-      hsl(90,  100%, 63%),
-      hsl(210, 100%, 63%),
-      hsl(195, 100%, 63%),
-      hsl(270, 100%, 63%),
-      hsl(0,   100%, 63%)
-    );
-  background-origin: padding-box, border-box;
-  background-clip: padding-box, border-box;
-  background-size: auto, 300% 100%;
-  animation: rainbow-border 3s linear infinite;
-}
 
 @keyframes shimmer {
   0% { background-position: -400px 0; }

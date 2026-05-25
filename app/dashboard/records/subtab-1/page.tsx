@@ -1,5 +1,5 @@
 import { createSupabaseServiceClient } from "@/lib/supabase/service";
-import CustomerRecords from "@/components/dashboard/CustomerRecords";
+import GuestRecords from "@/components/dashboard/CustomerRecords";
 
 export const dynamic = "force-dynamic";
 
@@ -15,5 +15,5 @@ export default async function RecordsSubtab1Page() {
     `)
     .order("created_at", { ascending: false });
 
-  return <CustomerRecords guests={guests ?? []} />;
+  return <GuestRecords guests={guests ?? []} />;
 }

@@ -5,6 +5,7 @@ import { usePathname, useRouter } from "next/navigation";
 import SidebarIconRail from "@/components/layout/SidebarIconRail";
 import Sidebar from "@/components/layout/Sidebar";
 import TopBar from "@/components/layout/TopBar";
+import { StaffAssignmentProvider } from "@/components/providers/StaffAssignmentProvider";
 
 const PRELOAD_NOW_ROUTES = [
   "/dashboard/summary",
@@ -81,7 +82,7 @@ export default function DashboardLayout({
     }
 
     if (pathname.startsWith("/dashboard/cleaning")) {
-      return "CleaningSchedule";
+      return "Maintenance";
     }
 
     if (pathname.startsWith("/dashboard/reports")) {
@@ -189,7 +190,9 @@ export default function DashboardLayout({
         <div className="flex min-h-0 min-w-0 flex-1 flex-col overflow-hidden">
           <TopBar onMenuClick={() => setMobileOpen(true)} />
           <main className="min-h-0 flex-1 overflow-y-auto overscroll-y-none [-webkit-overflow-scrolling:touch] p-4 sm:p-6 lg:p-8">
-            {children}
+            <StaffAssignmentProvider>
+              {children}
+            </StaffAssignmentProvider>
           </main>
         </div>
       </div>

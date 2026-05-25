@@ -59,7 +59,7 @@ const BLANK_FORM = {
   first_name: "",
   last_name: "",
   guest_type: "New" as "New" | "Returning" | "VIP",
-  contact_number: "+63",
+  contact_number: "",
   email: "",
   total_bookings: "0",
   last_stay: "",
@@ -173,7 +173,7 @@ function FL({ children }: { children: React.ReactNode }) {
 
 /* ─── Main component ─────────────────────────────────────────────────── */
 
-export default function CustomerRecords({ guests }: Props) {
+export default function GuestRecords({ guests }: Props) {
   const router = useRouter();
   const [, startTransition] = useTransition();
 
@@ -192,6 +192,7 @@ export default function CustomerRecords({ guests }: Props) {
   /* Form state */
   const [form, setForm] = useState(BLANK_FORM);
   const [emailError, setEmailError] = useState(false);
+  const [phoneError, setPhoneError] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [formError, setFormError] = useState("");
   const [deleting, setDeleting] = useState(false);
@@ -226,21 +227,24 @@ export default function CustomerRecords({ guests }: Props) {
     setForm(BLANK_FORM);
     setFormError("");
     setEmailError(false);
+    setPhoneError(false);
     setShowAdd(true);
   }
 
   function openEdit(g: Guest) {
+    const digits = (g.contact_number ?? "").replace(/\D/g, "").slice(-10);
     setForm({
       first_name: g.first_name,
       last_name: g.last_name,
       guest_type: g.guest_type,
-      contact_number: g.contact_number ?? "+63",
+      contact_number: digits,
       email: g.email ?? "",
       total_bookings: String(g.total_bookings),
       last_stay: g.last_stay ?? "",
     });
     setFormError("");
     setEmailError(false);
+    setPhoneError(false);
     setEditGuest(g);
   }
 
@@ -250,14 +254,13 @@ export default function CustomerRecords({ guests }: Props) {
     setForm(BLANK_FORM);
     setFormError("");
     setEmailError(false);
+    setPhoneError(false);
   }
 
   function handlePhoneChange(val: string) {
-    if (!val.startsWith("+63")) {
-      setF("contact_number", "+63");
-    } else {
-      setF("contact_number", val);
-    }
+    const digits = val.replace(/\D/g, "").slice(0, 10);
+    setF("contact_number", digits);
+    setPhoneError(digits.length > 0 && digits.length !== 10);
   }
 
   function handleEmailChange(val: string) {
@@ -273,6 +276,10 @@ export default function CustomerRecords({ guests }: Props) {
     e.preventDefault();
     if (!form.first_name.trim()) return setFormError("First name is required.");
     if (!form.last_name.trim()) return setFormError("Last name is required.");
+    if (form.contact_number && form.contact_number.length !== 10) {
+      setPhoneError(true);
+      return setFormError("Phone number must be exactly 10 digits.");
+    }
     if (form.email.trim() && !isValidEmail(form.email.trim())) {
       setEmailError(true);
       return setFormError("Please enter a valid email address.");
@@ -280,12 +287,11 @@ export default function CustomerRecords({ guests }: Props) {
     setSubmitting(true);
     setFormError("");
 
-    const contactVal = form.contact_number.trim();
     const payload = {
       first_name: form.first_name.trim(),
       last_name: form.last_name.trim(),
       guest_type: form.guest_type,
-      contact_number: contactVal === "+63" || contactVal === "" ? null : contactVal,
+      contact_number: form.contact_number ? `+63${form.contact_number}` : null,
       email: form.email.trim() || null,
       total_bookings: Number(form.total_bookings) || 0,
       last_stay: form.last_stay || null,
@@ -327,7 +333,7 @@ export default function CustomerRecords({ guests }: Props) {
 
       {/* Page title */}
       <h1 className="text-3xl font-bold tracking-tight text-text-on-light">
-        Customer <span className="font-light text-text-muted">Records</span>
+        Guest <span className="font-light text-text-muted">Records</span>
       </h1>
 
       {/* ── Table card ─────────────────────────────────────────────────── */}
@@ -336,7 +342,7 @@ export default function CustomerRecords({ guests }: Props) {
         {/* Toolbar */}
         <div className="flex flex-wrap items-center gap-3 border-b border-border px-6 py-4">
           {/* Search */}
-          <div className="rainbow-search relative max-w-xs flex-1">
+          <div className="relative max-w-xs flex-1">
             <Search
               className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-text-muted"
               size={13}
@@ -346,7 +352,7 @@ export default function CustomerRecords({ guests }: Props) {
               value={search}
               onChange={(e) => { setSearch(e.target.value); setPage(1); }}
               placeholder="Search customer..."
-              className="h-9 w-full bg-transparent pl-8 pr-4 text-sm text-text-on-light placeholder:text-text-muted focus:outline-none"
+              className="h-9 w-full rounded-xl border border-border bg-shell pl-8 pr-4 text-sm text-text-on-light placeholder:text-text-muted transition focus:border-[#9a9a9a] focus:outline-none"
             />
           </div>
 
@@ -760,12 +766,19 @@ export default function CustomerRecords({ guests }: Props) {
                         type="tel"
                         value={form.contact_number}
                         onChange={(e) => handlePhoneChange(e.target.value)}
-                        placeholder="+63 9XX XXX XXXX"
-                        className={inputCls}
+                        placeholder="10-digit number"
+                        maxLength={10}
+                        className={phoneError ? inputErrCls : inputCls}
                       />
-                      <p className="mt-1 text-[10px] text-text-muted">
-                        Must start with +63
-                      </p>
+                      {phoneError ? (
+                        <p className="mt-1 text-[10px] text-accent-red">
+                          Must be exactly 10 digits.
+                        </p>
+                      ) : (
+                        <p className="mt-1 text-[10px] text-text-muted">
+                          Digits only · exactly 10 characters
+                        </p>
+                      )}
                     </div>
                     <div>
                       <FL>Email Address</FL>
@@ -817,7 +830,7 @@ export default function CustomerRecords({ guests }: Props) {
                   </button>
                   <button
                     type="submit"
-                    disabled={submitting || emailError}
+                    disabled={submitting || emailError || phoneError}
                     className="rounded-xl bg-topbar px-6 py-2.5 text-sm font-semibold text-text-on-dark transition hover:opacity-75 disabled:opacity-50"
                   >
                     {submitting ? "Saving..." : editGuest ? "Save Changes" : "Add Guest"}

@@ -79,7 +79,7 @@ export async function getReviews(): Promise<ReviewWithGuest[]> {
   const supabase = createSupabaseServiceClient();
   const { data, error } = await supabase
     .from("reviews")
-    .select("*, guests(first_name, last_name), reservations(order_id)")
+    .select("*, guests(first_name, last_name, guest_type), reservations(order_id)")
     .order("review_date", { ascending: false });
 
   if (error || !data) return [];

@@ -6,8 +6,8 @@ import { useEffect, useRef, useState } from "react";
 import {
   BarChart,
   Calendar3,
-  CalendarCheck,
   Clipboard,
+  Tools,
   ClockHistory,
   ExclamationTriangle,
   FileEarmarkCheck,
@@ -66,22 +66,22 @@ const homeNavItems: SidebarNavItem[] = [
 ];
 
 const recordsNavItems: SidebarNavItem[] = [
-  { label: "Customer Records", href: "/dashboard/records/subtab-1", icon: PersonLinesFill },
+  { label: "Guest Records", href: "/dashboard/records/subtab-1", icon: PersonLinesFill },
   { label: "Reservation Records", href: "/dashboard/records/subtab-4", icon: FileEarmarkCheck },
   { label: "Financial Records", href: "/dashboard/records/subtab-2", icon: Receipt },
   { label: "Incidents", href: "/dashboard/records/subtab-3", icon: ExclamationTriangle }
 ];
 
-const cleaningNavItems: SidebarNavItem[] = [
-  { label: "Subtab 1", href: "/dashboard/cleaning/subtab-1", icon: Clipboard },
-  { label: "Subtab 2", href: "/dashboard/cleaning/subtab-2", icon: Clipboard },
-  { label: "Subtab 3", href: "/dashboard/cleaning/subtab-3", icon: Clipboard }
+const maintenanceNavItems: SidebarNavItem[] = [
+  { label: "Venue Preparation", href: "/dashboard/cleaning/subtab-1", icon: Clipboard },
+  { label: "Room Inspection", href: "/dashboard/cleaning/subtab-2", icon: Clipboard },
+  { label: "Maintenance Log", href: "/dashboard/cleaning/subtab-3", icon: Clipboard }
 ];
 
 const reportsNavItems: SidebarNavItem[] = [
-  { label: "Subtab 1", href: "/dashboard/reports/subtab-1", icon: Clipboard },
-  { label: "Subtab 2", href: "/dashboard/reports/subtab-2", icon: Clipboard },
-  { label: "Subtab 3", href: "/dashboard/reports/subtab-3", icon: Clipboard }
+  { label: "Occupancy Reports", href: "/dashboard/reports/subtab-1", icon: Clipboard },
+  { label: "Revenue Reports", href: "/dashboard/reports/subtab-2", icon: Clipboard },
+  { label: "Guest Analytics", href: "/dashboard/reports/subtab-3", icon: Clipboard }
 ];
 
 const flagsNavItems: SidebarNavItem[] = [
@@ -122,10 +122,10 @@ const mainTabNavItems: MainTabNavItem[] = [
     icon: Grid1x2
   },
   {
-    id: "CleaningSchedule",
-    label: "Cleaning Schedule",
+    id: "Maintenance",
+    label: "Maintenance",
     href: "/dashboard/cleaning/subtab-1",
-    icon: CalendarCheck
+    icon: Tools
   },
   {
     id: "ReportsAnalytics",
@@ -182,7 +182,7 @@ export default function Sidebar({
   const navItemsByMainTab: Record<string, SidebarNavItem[]> = {
     HomeDashboard: homeNavItems,
     RecordsManagement: recordsNavItems,
-    CleaningSchedule: cleaningNavItems,
+    Maintenance: maintenanceNavItems,
     ReportsAnalytics: reportsNavItems,
     FlagsMonitoring: flagsNavItems,
     ChangelogHistory: changelogNavItems,
@@ -196,7 +196,7 @@ export default function Sidebar({
   const titleMap: Record<string, { label: string; title?: string }> = {
     HomeDashboard: { label: "Home", title: "Dashboard" },
     RecordsManagement: { label: "Records", title: "Management" },
-    CleaningSchedule: { label: "Cleaning", title: "Schedule" },
+    Maintenance: { label: "Preparation &", title: "Maintenance" },
     ReportsAnalytics: { label: "Reports", title: "Analytics" },
     FlagsMonitoring: { label: "Flags", title: "Monitoring" },
     ChangelogHistory: { label: "System", title: "Changelog" },

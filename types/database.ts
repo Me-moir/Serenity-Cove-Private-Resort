@@ -150,7 +150,7 @@ export interface Review {
 }
 
 export interface ReviewWithGuest extends Review {
-  guests: Pick<Guest, "first_name" | "last_name"> | null;
+  guests: Pick<Guest, "first_name" | "last_name" | "guest_type"> | null;
   reservations: Pick<Reservation, "order_id"> | null;
 }
 

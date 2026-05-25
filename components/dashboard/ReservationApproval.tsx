@@ -36,6 +36,7 @@ interface Reservation {
   booking_source: string;
   special_notes: string | null;
   created_at: string;
+  actioned_at: string | null;
   guests: { first_name: string; last_name: string; guest_type: string } | null;
   reservation_addons: Addon[];
 }
@@ -65,6 +66,17 @@ function fmt_date(d: string) {
   return new Date(d + "T00:00:00").toLocaleDateString("en-US", {
     month: "short",
     day: "numeric",
+  });
+}
+
+function fmt_datetime(dt: string) {
+  return new Date(dt).toLocaleString("en-US", {
+    month: "short",
+    day: "numeric",
+    year: "numeric",
+    hour: "numeric",
+    minute: "2-digit",
+    hour12: true,
   });
 }
 
@@ -342,7 +354,7 @@ export default function ReservationApproval({ reservations, guests }: Props) {
 
         {/* Search + Add */}
         <div className="flex items-center gap-3 border-b border-border px-6 py-4">
-          <div className="rainbow-search relative max-w-sm flex-1">
+          <div className="relative max-w-sm flex-1">
             <Search
               className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-text-muted"
               size={13}
@@ -352,7 +364,7 @@ export default function ReservationApproval({ reservations, guests }: Props) {
               value={search}
               onChange={(e) => setSearch(e.target.value)}
               placeholder="Search reservation..."
-              className="h-9 w-full bg-transparent pl-8 pr-4 text-sm text-text-on-light placeholder:text-text-muted focus:outline-none"
+              className="h-9 w-full rounded-xl border border-border bg-shell pl-8 pr-4 text-sm text-text-on-light placeholder:text-text-muted transition focus:border-[#9a9a9a] focus:outline-none"
             />
           </div>
           <button
@@ -380,7 +392,7 @@ export default function ReservationApproval({ reservations, guests }: Props) {
                   "Dates Booked",
                   "Headcount",
                   "Total Price",
-                  "Status",
+                  "Payment Status",
                   "Requests",
                   "Actions",
                 ].map((h, i) => (
@@ -501,24 +513,43 @@ export default function ReservationApproval({ reservations, guests }: Props) {
 
                       {/* Actions */}
                       <td className="py-4 pl-4 pr-6">
-                        <div className="flex flex-col gap-1.5">
-                          <button
-                            type="button"
-                            disabled={loading || res.approval_status === "Approved"}
-                            onClick={() => handleAction(res.reservation_id, "Approved")}
-                            className="rounded-lg bg-topbar px-3 py-1.5 text-[10px] font-bold uppercase tracking-[0.22em] text-white transition hover:opacity-75 disabled:opacity-30"
-                          >
-                            {loading ? "·····" : "Approve"}
-                          </button>
-                          <button
-                            type="button"
-                            disabled={loading || res.approval_status === "Rejected"}
-                            onClick={() => handleAction(res.reservation_id, "Rejected")}
-                            className="rounded-lg bg-accent-red px-3 py-1.5 text-[10px] font-bold uppercase tracking-[0.22em] text-white transition hover:opacity-75 disabled:opacity-30"
-                          >
-                            {loading ? "·····" : "Reject"}
-                          </button>
-                        </div>
+                        {res.approval_status === "Pending" ? (
+                          <div className="flex flex-col gap-1.5">
+                            <button
+                              type="button"
+                              disabled={loading}
+                              onClick={() => handleAction(res.reservation_id, "Approved")}
+                              className="rounded-lg bg-topbar px-3 py-1.5 text-[10px] font-bold uppercase tracking-[0.22em] text-white transition hover:opacity-75 disabled:opacity-30"
+                            >
+                              {loading ? "·····" : "Approve"}
+                            </button>
+                            <button
+                              type="button"
+                              disabled={loading}
+                              onClick={() => handleAction(res.reservation_id, "Rejected")}
+                              className="rounded-lg bg-accent-red px-3 py-1.5 text-[10px] font-bold uppercase tracking-[0.22em] text-white transition hover:opacity-75 disabled:opacity-30"
+                            >
+                              {loading ? "·····" : "Reject"}
+                            </button>
+                          </div>
+                        ) : (
+                          <div className="min-w-[80px]">
+                            <div
+                              className={`rounded-lg px-3 py-1.5 text-center text-[10px] font-bold uppercase tracking-[0.22em] text-white ${
+                                res.approval_status === "Approved"
+                                  ? "bg-accent-green"
+                                  : "bg-accent-red"
+                              }`}
+                            >
+                              {res.approval_status}
+                            </div>
+                            {res.actioned_at && (
+                              <div className="mt-1.5 text-center text-[9px] leading-snug text-text-muted tabular-nums">
+                                {fmt_datetime(res.actioned_at)}
+                              </div>
+                            )}
+                          </div>
+                        )}
                       </td>
                     </tr>
                   );

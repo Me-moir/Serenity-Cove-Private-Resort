@@ -66,67 +66,67 @@ const SEARCH_ITEMS: SearchItem[] = [
     keywords: ["feedback", "rating", "comments"]
   },
   {
-    label: "Records Subtab 1",
+    label: "Guest Records",
     href: "/dashboard/records/subtab-1",
     group: "Records",
-    description: "Records management overview.",
-    keywords: ["records", "logs", "documents"]
+    description: "Guest profiles and booking history.",
+    keywords: ["guests", "profiles", "records"]
   },
   {
-    label: "Records Subtab 2",
+    label: "Financial Records",
     href: "/dashboard/records/subtab-2",
     group: "Records",
-    description: "Records detail view.",
-    keywords: ["records", "detail", "subtab 2"]
+    description: "Financial transactions and billing.",
+    keywords: ["financial", "billing", "payments"]
   },
   {
-    label: "Records Subtab 3",
+    label: "Incidents",
     href: "/dashboard/records/subtab-3",
     group: "Records",
-    description: "Records alternate view.",
-    keywords: ["records", "subtab 3", "history"]
+    description: "Incident reports and history.",
+    keywords: ["incidents", "reports", "issues"]
   },
   {
-    label: "Cleaning Subtab 1",
+    label: "Venue Preparation",
     href: "/dashboard/cleaning/subtab-1",
-    group: "Cleaning",
-    description: "Cleaning schedule overview.",
-    keywords: ["cleaning", "schedule", "shift"]
+    group: "Maintenance",
+    description: "Area-by-area preparation checklist.",
+    keywords: ["venue", "preparation", "checklist", "cleaning"]
   },
   {
-    label: "Cleaning Subtab 2",
+    label: "Room Inspection",
     href: "/dashboard/cleaning/subtab-2",
-    group: "Cleaning",
-    description: "Cleaning plan details.",
-    keywords: ["cleaning", "checklist", "subtab 2"]
+    group: "Maintenance",
+    description: "Room inspection checklist.",
+    keywords: ["inspection", "rooms", "maintenance"]
   },
   {
-    label: "Cleaning Subtab 3",
+    label: "Maintenance Log",
     href: "/dashboard/cleaning/subtab-3",
-    group: "Cleaning",
-    description: "Cleaning status and follow-ups.",
-    keywords: ["cleaning", "status", "subtab 3"]
+    group: "Maintenance",
+    description: "Maintenance tasks and activity log.",
+    keywords: ["maintenance", "log", "tasks"]
   },
   {
-    label: "Reports Subtab 1",
+    label: "Occupancy Reports",
     href: "/dashboard/reports/subtab-1",
     group: "Reports",
-    description: "Reports and analytics overview.",
-    keywords: ["reports", "analytics", "insights"]
+    description: "Occupancy rates and booking summaries.",
+    keywords: ["occupancy", "bookings", "availability"]
   },
   {
-    label: "Reports Subtab 2",
+    label: "Revenue Reports",
     href: "/dashboard/reports/subtab-2",
     group: "Reports",
-    description: "Additional reports details.",
-    keywords: ["reports", "subtab 2", "analysis"]
+    description: "Revenue breakdown and financial reports.",
+    keywords: ["revenue", "income", "financial", "reports"]
   },
   {
-    label: "Reports Subtab 3",
+    label: "Guest Analytics",
     href: "/dashboard/reports/subtab-3",
     group: "Reports",
-    description: "Extended reports view.",
-    keywords: ["reports", "subtab 3", "dashboard"]
+    description: "Guest trends and behaviour analytics.",
+    keywords: ["analytics", "guests", "trends"]
   },
   {
     label: "System Flags",
@@ -438,20 +438,20 @@ export default function CommandMenu() {
         ref={buttonRef}
         type="button"
         onClick={() => setIsOpen(true)}
-        className="flex w-full items-center justify-between rounded-full bg-topbar px-4 py-2 text-xs text-text-on-dark"
+        className="group relative flex w-full animate-rainbow cursor-pointer items-center justify-between rounded-full border-0 bg-[linear-gradient(#ffffff,#ffffff),linear-gradient(#ffffff_50%,rgba(255,255,255,0.6)_80%,rgba(0,0,0,0)),linear-gradient(90deg,hsl(0,100%,63%),hsl(90,100%,63%),hsl(210,100%,63%),hsl(195,100%,63%),hsl(270,100%,63%))] bg-[length:200%] px-4 py-2 text-xs text-text-on-light transition-transform duration-200 [background-clip:padding-box,border-box,border-box] [background-origin:border-box] [border:calc(0.08*1rem)_solid_transparent] before:absolute before:bottom-[-20%] before:left-1/2 before:z-0 before:h-[20%] before:w-[60%] before:-translate-x-1/2 before:animate-rainbow before:bg-[linear-gradient(90deg,hsl(0,100%,63%),hsl(90,100%,63%),hsl(210,100%,63%),hsl(195,100%,63%),hsl(270,100%,63%))] before:bg-[length:200%] before:[filter:blur(0.8rem)] hover:scale-105 active:scale-95 dark:bg-[linear-gradient(#191919,#191919),linear-gradient(#191919_50%,rgba(25,25,25,0.6)_80%,rgba(25,25,25,0)),linear-gradient(90deg,hsl(0,100%,63%),hsl(90,100%,63%),hsl(210,100%,63%),hsl(195,100%,63%),hsl(270,100%,63%))] dark:text-text-on-dark dark:ring-1 dark:ring-white/15"
         aria-label="Open command menu"
       >
         <span className="flex items-center gap-2">
           <Search size={14} />
-          <span className="text-text-on-dark/70">Find</span>
+          <span className="text-text-muted">Find</span>
         </span>
-        <kbd className="hidden rounded-full border border-white/30 px-2 py-0.5 text-[10px] tracking-[0.2em] sm:inline-flex">
+        <kbd className="hidden rounded-full border border-border px-2 py-0.5 text-[10px] tracking-[0.2em] sm:inline-flex">
           ⌘K
         </kbd>
       </button>
 
       {isOpen ? (
-        <div className="fixed inset-0 z-[60] flex items-start justify-center p-4 pt-20 sm:p-8 sm:pt-24">
+        <div className="fixed inset-0 z-[9999] flex items-start justify-center p-4 pt-20 sm:p-8 sm:pt-24">
           <button
             type="button"
             className="absolute inset-0 bg-black/55 backdrop-blur-[2px]"
