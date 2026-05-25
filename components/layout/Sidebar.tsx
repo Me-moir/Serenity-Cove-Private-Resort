@@ -99,14 +99,14 @@ const changelogNavItems: SidebarNavItem[] = [
 ];
 
 const profileNavItems: SidebarNavItem[] = [
-  { label: "Account Overview", href: "/dashboard/profile/subtab-1", icon: Clipboard },
-  { label: "Access & Roles", href: "/dashboard/profile/subtab-2", icon: Clipboard },
+  { label: "Personal Information", href: "/dashboard/profile/subtab-1", icon: Clipboard },
+  { label: "Password & Security", href: "/dashboard/profile/subtab-2", icon: Clipboard },
   { label: "Activity Logs", href: "/dashboard/profile/subtab-3", icon: Clipboard }
 ];
 
 const settingsNavItems: SidebarNavItem[] = [
-  { label: "Appearance", href: "/dashboard/settings/subtab-1", icon: Clipboard },
-  { label: "Notifications", href: "/dashboard/settings/subtab-2", icon: Clipboard },
+  { label: "General Settings", href: "/dashboard/settings/subtab-1", icon: Clipboard },
+  { label: "System Integrations", href: "/dashboard/settings/subtab-2", icon: Clipboard },
   { label: "Preferences", href: "/dashboard/settings/subtab-3", icon: Clipboard }
 ];
 
