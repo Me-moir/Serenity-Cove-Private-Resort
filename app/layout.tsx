@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { GeistSans } from "geist/font/sans";
+import { SpeedInsights } from "@vercel/speed-insights/next";
 import "../styles/globals.css";
 import { ThemeProvider } from "@/components/theme/ThemeProvider";
 
@@ -42,6 +43,7 @@ export default function RootLayout({
       </head>
       <body className="min-h-screen bg-shell text-text-on-light antialiased transition-colors duration-300">
         <ThemeProvider>{children}</ThemeProvider>
+        <SpeedInsights />
       </body>
     </html>
   );
