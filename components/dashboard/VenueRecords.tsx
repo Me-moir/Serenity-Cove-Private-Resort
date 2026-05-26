@@ -14,8 +14,6 @@ import {
 } from "react-bootstrap-icons";
 import { updateVenue, deleteVenue } from "@/app/actions/venues";
 
-/* ─── Types ──────────────────────────────────────────────────────────── */
-
 interface Venue {
   venue_id: number;
   venue_name: string;
@@ -30,11 +28,7 @@ interface Props {
   venues: Venue[];
 }
 
-/* ─── Constants ──────────────────────────────────────────────────────── */
-
 const PAGE_SIZE = 10;
-
-/* ─── Helpers ────────────────────────────────────────────────────────── */
 
 const PHP = (n: number) =>
   new Intl.NumberFormat("en-PH", {
@@ -53,8 +47,6 @@ function getPageNums(cur: number, total: number): (number | "…")[] {
   return nums;
 }
 
-/* ─── Form helpers ───────────────────────────────────────────────────── */
-
 const inputCls =
   "h-10 w-full rounded-xl border border-border bg-shell px-3 text-sm text-text-on-light placeholder:text-text-muted/50 focus:border-[#9a9a9a] focus:outline-none transition";
 const selectCls =
@@ -63,8 +55,6 @@ const selectCls =
 function FL({ children }: { children: React.ReactNode }) {
   return <label className="mb-1.5 block text-xs font-medium text-text-muted">{children}</label>;
 }
-
-/* ─── Main component ─────────────────────────────────────────────────── */
 
 export default function VenueRecords({ venues }: Props) {
   const router = useRouter();
@@ -173,8 +163,6 @@ export default function VenueRecords({ venues }: Props) {
       setDeleting(false);
     }
   }
-
-  /* ─── Render ──────────────────────────────────────────────────────── */
 
   return (
     <div className="space-y-5">

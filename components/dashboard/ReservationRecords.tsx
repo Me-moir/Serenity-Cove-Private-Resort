@@ -21,8 +21,6 @@ import {
   deleteReservation,
 } from "@/app/actions/reservations";
 
-/* ─── Types ──────────────────────────────────────────────────────────── */
-
 interface BookedVenue {
   price_snapshot: number;
   venue_price_list: { venue_name: string; category: string } | null;
@@ -66,11 +64,7 @@ interface Props {
   venues: VenueOption[];
 }
 
-/* ─── Constants ──────────────────────────────────────────────────────── */
-
 const PAGE_SIZE = 10;
-
-/* ─── Helpers ────────────────────────────────────────────────────────── */
 
 const PHP = (n: number) =>
   new Intl.NumberFormat("en-PH", {
@@ -120,8 +114,6 @@ function getPageNums(cur: number, total: number): (number | "…")[] {
   return nums;
 }
 
-/* ─── Badge components ───────────────────────────────────────────────── */
-
 function StatusBadge({ status }: { status: "Pending" | "Approved" | "Rejected" }) {
   if (status === "Approved")
     return (
@@ -170,8 +162,6 @@ function PaymentBadge({ status }: { status: string }) {
   );
 }
 
-/* ─── Form helpers ───────────────────────────────────────────────────── */
-
 const inputCls =
   "h-10 w-full rounded-xl border border-border bg-shell px-3 text-sm text-text-on-light placeholder:text-text-muted/50 focus:border-[#9a9a9a] focus:outline-none transition";
 const selectCls =
@@ -180,8 +170,6 @@ const selectCls =
 function FL({ children }: { children: React.ReactNode }) {
   return <label className="mb-1.5 block text-xs font-medium text-text-muted">{children}</label>;
 }
-
-/* ─── Main component ─────────────────────────────────────────────────── */
 
 export default function ReservationRecords({ reservations, venues }: Props) {
   const router = useRouter();
@@ -357,8 +345,6 @@ export default function ReservationRecords({ reservations, venues }: Props) {
       setDeleting(false);
     }
   }
-
-  /* ─── Render ──────────────────────────────────────────────────────── */
 
   return (
     <div className="space-y-5">

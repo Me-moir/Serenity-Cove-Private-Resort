@@ -13,8 +13,6 @@ import {
 } from "react-bootstrap-icons";
 import type { ReviewWithGuest } from "@/types/database";
 
-// ─── Tailwind class maps ──────────────────────────────────────────────────────
-
 const GUEST_TYPE_CLS: Record<string, string> = {
   New:       "bg-accent-blue/15 text-accent-blue",
   Returning: "bg-accent-green/15 text-accent-green",
@@ -39,8 +37,6 @@ const AVATAR_PALETTES = [
   "bg-accent-orange/15 text-accent-orange",
 ];
 
-// ─── Helpers ──────────────────────────────────────────────────────────────────
-
 function StarRowLight({ rating, size = 11 }: { rating: number; size?: number }) {
   return (
     <div className="flex gap-0.5">
@@ -61,8 +57,6 @@ function TrendIcon({ delta }: { delta: number }) {
   return <DashLg size={10} className="shrink-0 text-text-muted" />;
 }
 
-// ─── Main component ───────────────────────────────────────────────────────────
-
 const PER_PAGE = 5;
 const MONTHS_BACK = 6;
 
@@ -72,8 +66,6 @@ export default function CustomerFeedbackView({ reviews }: { reviews: ReviewWithG
   const [page, setPage] = useState(0);
 
   const now = new Date();
-
-  // ── Derived stats ───────────────────────────────────────────────────────────
 
   const avgRating =
     reviews.length > 0
@@ -129,7 +121,6 @@ export default function CustomerFeedbackView({ reviews }: { reviews: ReviewWithG
     }),
   [reviews]);
 
-  // Filtered / paginated reviews
   const filtered = useMemo(
     () =>
       reviews.filter((r) => {

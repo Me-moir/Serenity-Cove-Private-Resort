@@ -55,7 +55,6 @@ export async function deleteGuest(guestId: number) {
     await sb.from("reservations").delete().in("reservation_id", resIds);
   }
 
-  // Delete any guest-level records not tied to a specific reservation
   await sb.from("reviews").delete().eq("guest_id", guestId);
   await sb.from("incidents").delete().eq("guest_id", guestId);
 

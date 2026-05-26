@@ -17,8 +17,6 @@ import {
   type NoteState,
 } from "@/lib/data/cleaningChecklist";
 
-// ─── Status logic ─────────────────────────────────────────────────────────────
-
 type OverviewStatus = "Occupied" | "Vacated" | "In Prep" | "Ready";
 
 function getOverviewStatus(
@@ -55,8 +53,6 @@ const STATUS_CFG: Record<OverviewStatus, { dot: string; badge: string; label: st
   },
 };
 
-// ─── Component ─────────────────────────────────────────────────────────────────
-
 export default function CleaningSubtab1Page() {
   const { dbStaff } = useStaffAssignments();
 
@@ -70,7 +66,6 @@ export default function CleaningSubtab1Page() {
     typeof window === "undefined" ? INIT_DAMAGE_NOTES : safeLS(LS_KEYS.damage, INIT_DAMAGE_NOTES)
   );
 
-  // ── Stats ────────────────────────────────────────────────────────────────────
   const statuses = AREAS.map((a) => getOverviewStatus(prepChecks[a.id], checkedOut[a.id]));
   const occupiedCount = statuses.filter((s) => s === "Occupied").length;
   const vacatedCount  = statuses.filter((s) => s === "Vacated").length;
@@ -79,12 +74,10 @@ export default function CleaningSubtab1Page() {
 
   const activeCount = vacatedCount + inPrepCount + readyCount; // rooms being worked on
 
-  // ── Staff ────────────────────────────────────────────────────────────────────
   const staffList = dbStaff.length > 0
     ? dbStaff.map((s) => ({ name: s.staff_name, role: s.role, status: "On Duty" }))
     : STAFF.map((s) => ({ name: s.name, role: s.role, status: s.status }));
 
-  // ── Flagged damage notes ─────────────────────────────────────────────────────
   const flaggedNotes = AREAS
     .filter((a) => damageNotes[a.id]?.trim())
     .map((a) => ({ label: a.label, note: damageNotes[a.id].trim() }));

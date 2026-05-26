@@ -17,8 +17,6 @@ import {
   deleteFinancialRecord,
 } from "@/app/actions/financial-records";
 
-/* ─── Types ──────────────────────────────────────────────────────────── */
-
 interface FinancialRecord {
   record_id: number;
   reservation_id: number;
@@ -33,13 +31,9 @@ interface Props {
   records: FinancialRecord[];
 }
 
-/* ─── Constants ──────────────────────────────────────────────────────── */
-
 const PAGE_SIZE = 10;
 
 const RECORD_TYPES = ["Revenue", "Outstanding Balance", "Refund", "Cancellation"] as const;
-
-/* ─── Helpers ────────────────────────────────────────────────────────── */
 
 const PHP = (n: number) =>
   new Intl.NumberFormat("en-PH", {
@@ -66,8 +60,6 @@ function getPageNums(cur: number, total: number): (number | "…")[] {
   return nums;
 }
 
-/* ─── Badge ──────────────────────────────────────────────────────────── */
-
 function TypeBadge({ type }: { type: string }) {
   const map: Record<string, string> = {
     Revenue: "bg-accent-green/15 text-accent-green",
@@ -82,8 +74,6 @@ function TypeBadge({ type }: { type: string }) {
   );
 }
 
-/* ─── Form helpers ───────────────────────────────────────────────────── */
-
 const inputCls =
   "h-10 w-full rounded-xl border border-border bg-shell px-3 text-sm text-text-on-light placeholder:text-text-muted/50 focus:border-[#9a9a9a] focus:outline-none transition";
 const selectCls =
@@ -92,8 +82,6 @@ const selectCls =
 function FL({ children }: { children: React.ReactNode }) {
   return <label className="mb-1.5 block text-xs font-medium text-text-muted">{children}</label>;
 }
-
-/* ─── Main component ─────────────────────────────────────────────────── */
 
 export default function FinancialRecords({ records }: Props) {
   const router = useRouter();
@@ -193,8 +181,6 @@ export default function FinancialRecords({ records }: Props) {
       setDeleting(false);
     }
   }
-
-  /* ─── Render ──────────────────────────────────────────────────────── */
 
   return (
     <div className="space-y-5">

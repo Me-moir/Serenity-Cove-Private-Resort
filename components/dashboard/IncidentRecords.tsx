@@ -14,8 +14,6 @@ import {
 } from "react-bootstrap-icons";
 import { updateIncident, deleteIncident } from "@/app/actions/incidents";
 
-/* ─── Types ──────────────────────────────────────────────────────────── */
-
 interface Incident {
   incident_id: number;
   guest_id: number;
@@ -32,13 +30,9 @@ interface Props {
   incidents: Incident[];
 }
 
-/* ─── Constants ──────────────────────────────────────────────────────── */
-
 const PAGE_SIZE = 10;
 
 const STATUSES = ["None", "Reported", "Pending", "Resolved"] as const;
-
-/* ─── Helpers ────────────────────────────────────────────────────────── */
 
 function fmtDatetime(ts: string) {
   const d = new Date(ts);
@@ -59,8 +53,6 @@ function getPageNums(cur: number, total: number): (number | "…")[] {
   return nums;
 }
 
-/* ─── Badge ──────────────────────────────────────────────────────────── */
-
 function StatusBadge({ status }: { status: string }) {
   const map: Record<string, string> = {
     None: "border border-border text-text-muted",
@@ -75,8 +67,6 @@ function StatusBadge({ status }: { status: string }) {
   );
 }
 
-/* ─── Form helpers ───────────────────────────────────────────────────── */
-
 const inputCls =
   "h-10 w-full rounded-xl border border-border bg-shell px-3 text-sm text-text-on-light placeholder:text-text-muted/50 focus:border-[#9a9a9a] focus:outline-none transition";
 const selectCls =
@@ -85,8 +75,6 @@ const selectCls =
 function FL({ children }: { children: React.ReactNode }) {
   return <label className="mb-1.5 block text-xs font-medium text-text-muted">{children}</label>;
 }
-
-/* ─── Main component ─────────────────────────────────────────────────── */
 
 export default function IncidentRecords({ incidents }: Props) {
   const router = useRouter();
@@ -185,8 +173,6 @@ export default function IncidentRecords({ incidents }: Props) {
       setDeleting(false);
     }
   }
-
-  /* ─── Render ──────────────────────────────────────────────────────── */
 
   return (
     <div className="space-y-5">

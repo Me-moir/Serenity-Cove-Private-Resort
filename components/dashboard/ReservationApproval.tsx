@@ -14,8 +14,6 @@ import {
 } from "react-bootstrap-icons";
 import { addReservation, updateApprovalStatus } from "@/app/actions/reservations";
 
-/* ─── Types ─────────────────────────────────────────────────────────── */
-
 interface Addon {
   addon_name: string;
   addon_category: string | null;
@@ -73,8 +71,6 @@ interface Props {
   venues: VenueOption[];
 }
 
-/* ─── Helpers ────────────────────────────────────────────────────────── */
-
 const PHP = (n: number) =>
   new Intl.NumberFormat("en-PH", {
     style: "currency",
@@ -127,8 +123,6 @@ const approvalColor: Record<string, string> = {
   Rejected: "text-accent-red",
 };
 
-/* ─── Stat Card ──────────────────────────────────────────────────────── */
-
 function StatCard({
   icon,
   count,
@@ -163,8 +157,6 @@ function StatCard({
   );
 }
 
-/* ─── Form field helpers ─────────────────────────────────────────────── */
-
 function FieldLabel({ children }: { children: React.ReactNode }) {
   return (
     <label className="mb-1.5 block text-xs font-medium text-text-muted">
@@ -179,8 +171,6 @@ const inputClass =
 const selectClass =
   "h-10 w-full rounded-xl border border-border bg-shell px-3 text-sm text-text-on-light focus:border-[#9a9a9a] focus:outline-none transition appearance-none";
 
-/* ─── Initial form state ─────────────────────────────────────────────── */
-
 const BLANK_FORM = {
   guest_id: "",
   check_in_date: "",
@@ -194,8 +184,6 @@ const BLANK_FORM = {
   booking_source: "Website",
   special_notes: "",
 };
-
-/* ─── Main component ─────────────────────────────────────────────────── */
 
 export default function ReservationApproval({ reservations, guests, venues }: Props) {
   const router = useRouter();
@@ -363,8 +351,6 @@ export default function ReservationApproval({ reservations, guests, venues }: Pr
     setSelectedVenues([]);
     setFormError("");
   }
-
-  /* ─── Render ─────────────────────────────────────────────────────────── */
 
   return (
     <div className="space-y-6">

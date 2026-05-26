@@ -1,7 +1,5 @@
 import { createSupabaseServiceClient } from "@/lib/supabase/service";
 
-// ─── Financial Reports ─────────────────────────────────────────────────────────
-
 const FINANCIAL_FALLBACK = {
   totalRevenue: 0,
   outstandingBalance: 0,
@@ -36,7 +34,6 @@ export async function getFinancialReportData(from: string, to: string) {
       0,
     );
 
-    // Weekly revenue buckets
     const weeklyMap: Record<string, number> = {};
     for (const r of revenue) {
       const d = new Date(r.record_date);
@@ -46,7 +43,6 @@ export async function getFinancialReportData(from: string, to: string) {
     }
     const weeklyRevenue = Object.entries(weeklyMap).map(([week, gross]) => ({ week, gross }));
 
-    // Fetch reservations for guest names
     const allResIds = [...outstanding, ...refunds, ...cancellations]
       .map((r) => r.reservation_id)
       .filter(Boolean);
@@ -123,8 +119,6 @@ export async function getFinancialReportData(from: string, to: string) {
   }
 }
 
-// ─── Reservation Reports ───────────────────────────────────────────────────────
-
 const RESERVATION_FALLBACK = {
   occupancyByWeek: [] as { week: number; rate: number }[],
   bookingFrequency: [] as { week: number; count: number }[],
@@ -148,7 +142,6 @@ export async function getReservationReportData(from: string, to: string) {
 
     const TOTAL_ROOMS = 10;
 
-    // Occupancy by week
     const weekOccMap: Record<number, number> = {};
     for (const r of reservations) {
       const d = new Date(r.check_in_date);
@@ -162,7 +155,6 @@ export async function getReservationReportData(from: string, to: string) {
       }))
       .sort((a, b) => a.week - b.week);
 
-    // Booking frequency by creation week
     const freqMap: Record<number, number> = {};
     for (const r of reservations) {
       const d = new Date(r.created_at);
@@ -173,7 +165,6 @@ export async function getReservationReportData(from: string, to: string) {
       .map(([week, count]) => ({ week: Number(week), count }))
       .sort((a, b) => a.week - b.week);
 
-    // Peak check-in dates
     const dateMap: Record<string, number> = {};
     for (const r of reservations) {
       const d = new Date(r.check_in_date).toLocaleDateString("en-US", {
@@ -193,7 +184,6 @@ export async function getReservationReportData(from: string, to: string) {
         occupancy: Math.min(100, Math.round((count / TOTAL_ROOMS) * 100)),
       }));
 
-    // Booking sources
     const sourceMap: Record<string, number> = {};
     for (const r of reservations) {
       const s = r.booking_source || "Website";
@@ -206,7 +196,6 @@ export async function getReservationReportData(from: string, to: string) {
       percentage: Math.round((count / total) * 100),
     }));
 
-    // Most frequent guests
     const { data: guests } = await supabase
       .from("guests")
       .select("guest_id, first_name, last_name, guest_type, total_bookings, last_stay")

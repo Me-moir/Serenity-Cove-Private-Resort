@@ -17,8 +17,6 @@ import {
 } from "react-bootstrap-icons";
 import { addGuest, updateGuest, deleteGuest } from "@/app/actions/guests";
 
-/* ─── Types ──────────────────────────────────────────────────────────── */
-
 interface ReservationRef {
   order_id: string;
   created_at: string;
@@ -52,8 +50,6 @@ interface Props {
   guests: Guest[];
 }
 
-/* ─── Constants ──────────────────────────────────────────────────────── */
-
 const PAGE_SIZE = 10;
 
 const BLANK_FORM = {
@@ -65,8 +61,6 @@ const BLANK_FORM = {
   total_bookings: "0",
   last_stay: "",
 };
-
-/* ─── Helpers ────────────────────────────────────────────────────────── */
 
 function fmtId(id: number) {
   return `#${String(id).padStart(7, "0")}`;
@@ -97,8 +91,6 @@ function getIncidentBadge(incidents: IncidentRef[]) {
 function isValidEmail(email: string) {
   return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
 }
-
-/* ─── Badge components ───────────────────────────────────────────────── */
 
 function IncidentBadge({ status }: { status: string }) {
   if (status === "Reported")
@@ -159,8 +151,6 @@ function GuestTypePill({ type }: { type: string }) {
   );
 }
 
-/* ─── Form helpers ───────────────────────────────────────────────────── */
-
 const inputCls =
   "h-10 w-full rounded-xl border border-border bg-shell px-3 text-sm text-text-on-light placeholder:text-text-muted/50 focus:border-[#9a9a9a] focus:outline-none transition";
 const inputErrCls =
@@ -171,8 +161,6 @@ const selectCls =
 function FL({ children }: { children: React.ReactNode }) {
   return <label className="mb-1.5 block text-xs font-medium text-text-muted">{children}</label>;
 }
-
-/* ─── Main component ─────────────────────────────────────────────────── */
 
 export default function GuestRecords({ guests }: Props) {
   const router = useRouter();
@@ -327,8 +315,6 @@ export default function GuestRecords({ guests }: Props) {
       setDeleting(false);
     }
   }
-
-  /* ─── Render ──────────────────────────────────────────────────────── */
 
   return (
     <div className="space-y-5">

@@ -5,8 +5,6 @@ import { PencilFill, XLg } from "react-bootstrap-icons";
 import { ALL_AREA_NAMES } from "@/lib/data/venueAreas";
 import { useStaffAssignments, type DbStaff } from "@/components/providers/StaffAssignmentProvider";
 
-// ─── Color palette (cycles by index) ────────────────────────────────────────
-
 const COLORS = ["blue", "green", "orange"] as const;
 type Color = (typeof COLORS)[number];
 
@@ -21,8 +19,6 @@ const TAG_CLS: Record<Color, string> = {
   green:  "bg-accent-green/15 text-accent-green",
   orange: "bg-accent-orange/15 text-accent-orange",
 };
-
-// ─── Edit modal ─────────────────────────────────────────────────────────────
 
 function EditModal({
   member,
@@ -142,8 +138,6 @@ function EditModal({
     </div>
   );
 }
-
-// ─── Main component ──────────────────────────────────────────────────────────
 
 export default function StaffTaskView() {
   const { dbStaff, assignments, updateStaffAreas } = useStaffAssignments();

@@ -14,8 +14,6 @@ interface Props {
   scopeFilter?: ReactNode;
 }
 
-// ─── Palette ──────────────────────────────────────────────────────────────────
-
 const C = {
   line:  "#111111",
   bar:   "#1a1a1a",
@@ -24,8 +22,6 @@ const C = {
   // donut shades — black, red, yellow, gray, light gray
   seg: ["#111111", "#DC2626", "#CA8A04", "#71717a", "#d4d4d8"],
 };
-
-// ─── Catmull-Rom smooth curve ─────────────────────────────────────────────────
 
 function smooth(pts: { x: number; y: number }[]): string {
   if (!pts.length) return "";
@@ -45,15 +41,11 @@ function smooth(pts: { x: number; y: number }[]): string {
   return d;
 }
 
-// ─── Rounded-top bar path ─────────────────────────────────────────────────────
-
 function roundedTopBar(x: number, y: number, w: number, h: number, r: number): string {
   const cr = Math.min(r, h / 2, w / 2);
   if (cr <= 0) return `M${x},${y + h} L${x},${y} L${x + w},${y} L${x + w},${y + h} Z`;
   return `M${x},${y + h} L${x},${y + cr} Q${x},${y} ${x + cr},${y} L${x + w - cr},${y} Q${x + w},${y} ${x + w},${y + cr} L${x + w},${y + h} Z`;
 }
-
-// ─── Shared empty state ───────────────────────────────────────────────────────
 
 function Empty() {
   return (
@@ -63,8 +55,6 @@ function Empty() {
   );
 }
 
-// ─── Chart label ──────────────────────────────────────────────────────────────
-
 function ChartLabel({ children }: { children: React.ReactNode }) {
   return (
     <p className="mb-4 text-[10px] font-semibold uppercase tracking-[0.2em] text-text-muted">
@@ -72,8 +62,6 @@ function ChartLabel({ children }: { children: React.ReactNode }) {
     </p>
   );
 }
-
-// ─── Occupancy area chart ─────────────────────────────────────────────────────
 
 function OccupancyChart({ data }: { data: { week: number; rate: number }[] }) {
   if (!data.length) return <Empty />;
@@ -143,8 +131,6 @@ function OccupancyChart({ data }: { data: { week: number; rate: number }[] }) {
   );
 }
 
-// ─── Frequency bar chart ──────────────────────────────────────────────────────
-
 function FrequencyBarChart({ data }: { data: { week: number; count: number }[] }) {
   if (!data.length) return <Empty />;
 
@@ -185,8 +171,6 @@ function FrequencyBarChart({ data }: { data: { week: number; count: number }[] }
     </svg>
   );
 }
-
-// ─── Donut chart ──────────────────────────────────────────────────────────────
 
 function DonutChart({ data }: { data: { source: string; count: number; percentage: number }[] }) {
   if (!data.length) return <Empty />;
@@ -244,8 +228,6 @@ function DonutChart({ data }: { data: { source: string; count: number; percentag
     </div>
   );
 }
-
-// ─── Main ─────────────────────────────────────────────────────────────────────
 
 export default function ReservationReportsClient({ data, scopeFilter }: Props) {
   return (

@@ -13,8 +13,6 @@ import {
 } from "react-bootstrap-icons";
 import { updateStaff, deleteStaff } from "@/app/actions/staff";
 
-/* ─── Types ──────────────────────────────────────────────────────────── */
-
 interface StaffMember {
   staff_id: number;
   staff_name: string;
@@ -26,11 +24,7 @@ interface Props {
   staff: StaffMember[];
 }
 
-/* ─── Constants ──────────────────────────────────────────────────────── */
-
 const PAGE_SIZE = 10;
-
-/* ─── Helpers ────────────────────────────────────────────────────────── */
 
 function getPageNums(cur: number, total: number): (number | "…")[] {
   if (total <= 7) return Array.from({ length: total }, (_, i) => i + 1);
@@ -42,16 +36,12 @@ function getPageNums(cur: number, total: number): (number | "…")[] {
   return nums;
 }
 
-/* ─── Form helpers ───────────────────────────────────────────────────── */
-
 const inputCls =
   "h-10 w-full rounded-xl border border-border bg-shell px-3 text-sm text-text-on-light placeholder:text-text-muted/50 focus:border-[#9a9a9a] focus:outline-none transition";
 
 function FL({ children }: { children: React.ReactNode }) {
   return <label className="mb-1.5 block text-xs font-medium text-text-muted">{children}</label>;
 }
-
-/* ─── Main component ─────────────────────────────────────────────────── */
 
 export default function StaffRoster({ staff }: Props) {
   const router = useRouter();
@@ -139,8 +129,6 @@ export default function StaffRoster({ staff }: Props) {
       setDeleting(false);
     }
   }
-
-  /* ─── Render ──────────────────────────────────────────────────────── */
 
   return (
     <div className="space-y-5">

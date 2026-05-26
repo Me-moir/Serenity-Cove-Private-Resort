@@ -19,8 +19,6 @@ interface Props {
   scopeFilter?: ReactNode;
 }
 
-// ─── Palette ──────────────────────────────────────────────────────────────────
-
 const C = {
   line: "#111111",
   bar:  "#1a1a1a",
@@ -30,8 +28,6 @@ const C = {
 
 const PHP = (n: number) =>
   new Intl.NumberFormat("en-PH", { style: "currency", currency: "PHP", maximumFractionDigits: 0 }).format(n);
-
-// ─── Catmull-Rom smooth curve ─────────────────────────────────────────────────
 
 function smooth(pts: { x: number; y: number }[]): string {
   if (!pts.length) return "";
@@ -51,8 +47,6 @@ function smooth(pts: { x: number; y: number }[]): string {
   return d;
 }
 
-// ─── Empty state ──────────────────────────────────────────────────────────────
-
 function Empty() {
   return (
     <div className="flex h-44 items-center justify-center text-xs text-text-muted">
@@ -61,8 +55,6 @@ function Empty() {
   );
 }
 
-// ─── Chart label ──────────────────────────────────────────────────────────────
-
 function ChartLabel({ children }: { children: React.ReactNode }) {
   return (
     <p className="mb-2 text-[10px] font-semibold uppercase tracking-[0.2em] text-text-muted">
@@ -70,8 +62,6 @@ function ChartLabel({ children }: { children: React.ReactNode }) {
     </p>
   );
 }
-
-// ─── Revenue area chart ───────────────────────────────────────────────────────
 
 function RevenueLineChart({ data }: { data: WeeklyRevenue[] }) {
   if (!data.length) return <Empty />;
@@ -144,9 +134,6 @@ function RevenueLineChart({ data }: { data: WeeklyRevenue[] }) {
     </svg>
   );
 }
-
-
-// ─── Main ─────────────────────────────────────────────────────────────────────
 
 export default function FinancialReportsClient({ data, scopeFilter }: Props) {
   const net = data.totalRevenue - data.outstandingBalance - data.totalRefundsAndCancellations;
